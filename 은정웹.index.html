@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>포켓몬 카드 - 세상을 바꾸는 카드게임</title>
+  <!-- Tailwind CSS CDN (Layout & Base Styling) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts (Noto Sans KR & Black Han Sans for bold headings) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* Custom Theme & Typography Styles */
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      scroll-behavior: smooth;
+      background-color: #fcfcfc;
+    }
+    
+    .font-title {
+      font-family: 'Black Han Sans', sans-serif;
+      letter-spacing: 0.05em;
+    }
+
+    /* Pokemon Ball Theme Gradient & Colors */
+    .bg-poke-red {
+      background-color: #EE1515;
+    }
+    .text-poke-red {
+      color: #EE1515;
+    }
+    .border-poke-red {
+      border-color: #EE1515;
+    }
+    .bg-poke-dark {
+      background-color: #222224;
+    }
+
+    /* Custom Animation for Playful Pokemons */
+    @keyframes bounce-gentle {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(3deg); }
+    }
+    @keyframes float-slow {
+      0%, 100% { transform: translateY(0px) rotate(-1deg); }
+      50% { transform: translateY(-10px) rotate(1deg); }
+    }
+    @keyframes spin-pokeball {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    .animate-bounce-gentle {
+      animation: bounce-gentle 4s ease-in-out infinite;
+    }
+    .animate-float-slow {
+      animation: float-slow 6s ease-in-out infinite;
+    }
+    .animate-spin-pokeball {
+      animation: spin-pokeball 20s linear infinite;
+    }
+
+    /* Card Flip Effect */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .card-inner {
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+    .card-hover:hover .card-inner {
+      transform: rotateY(180deg);
+    }
+    .card-front, .card-back {
+      backface-visibility: hidden;
+    }
+    .card-back {
+      transform: rotateY(180deg);
+    }
+  </style>
+</head>
+<body class="text-neutral-800 overflow-x-hidden">
+
+  <!-- NAVIGATION HEADER -->
+  <header class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md z-50 border-b-4 border-poke-red shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-2 group">
+        <div class="relative w-10 h-10 bg-white rounded-full border-4 border-black flex items-center justify-center overflow-hidden shadow-inner">
+          <div class="absolute top-0 left-0 w-full h-1/2 bg-poke-red"></div>
+          <div class="absolute top-[14px] left-0 w-full h-2 bg-black"></div>
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full border-4 border-black z-10"></div>
+        </div>
+        <span class="font-title text-2xl tracking-wider text-poke-dark group-hover:text-poke-red transition-colors">
+          POKÉMON <span class="text-poke-red">CARD</span>
+        </span>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center gap-8 font-medium">
+        <a href="#playground" class="hover:text-poke-red transition-colors">포켓몬 놀이터</a>
+        <a href="#intro" class="hover:text-poke-red transition-colors">배틀 소개</a>
+        <a href="#attraction" class="hover:text-poke-red transition-colors">핵심 매력</a>
+        <a href="#packs" class="hover:text-poke-red transition-colors">카드팩 라인업</a>
+      </nav>
+
+      <!-- CTA Button -->
+      <div class="hidden sm:block">
+        <a href="#packs" class="bg-poke-red text-white font-bold px-5 py-2.5 rounded-full shadow-lg hover:bg-red-700 transition-all transform hover:scale-105 inline-flex items-center gap-2 text-sm">
+          <i class="fa-solid fa-gamepad"></i> 카드 배틀 시작하기
+        </a>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button id="menu-btn" class="md:hidden text-2xl text-poke-dark focus:outline-none">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-neutral-100 px-4 py-4 space-y-3 shadow-lg">
+      <a href="#playground" class="block font-medium py-2 hover:text-poke-red" onclick="toggleMenu()">포켓몬 놀이터</a>
+      <a href="#intro" class="block font-medium py-2 hover:text-poke-red" onclick="toggleMenu()">배틀 소개</a>
+      <a href="#attraction" class="block font-medium py-2 hover:text-poke-red" onclick="toggleMenu()">핵심 매력</a>
+      <a href="#packs" class="block font-medium py-2 hover:text-poke-red" onclick="toggleMenu()">카드팩 라인업</a>
+      <a href="#packs" class="block bg-poke-red text-white text-center font-bold py-2.5 rounded-full" onclick="toggleMenu()">카드 배틀 시작하기</a>
+    </div>
+  </header>
+
+  <!-- HERO SECTION / SECTION 1: 포켓몬들이 신나게 노는 공간 -->
+  <section id="playground" class="relative pt-28 pb-20 md:py-36 bg-gradient-to-b from-red-50 to-white overflow-hidden min-h-screen flex items-center">
+    <!-- Decorative PokeBall Background -->
+    <div class="absolute -right-20 -bottom-20 w-96 h-96 md:w-[600px] md:h-[600px] opacity-5 pointer-events-none">
+      <svg class="animate-spin-pokeball w-full h-full text-poke-dark" viewBox="0 0 100 100" fill="currentColor">
+        <circle cx="50" cy="50" r="48" stroke="currentColor" stroke-width="4" fill="none"/>
+        <line x1="2" y1="50" x2="98" y2="50" stroke="currentColor" stroke-width="4"/>
+        <circle cx="50" cy="50" r="15" fill="none" stroke="currentColor" stroke-width="4"/>
+      </svg>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <!-- Text Content -->
+        <div class="lg:col-span-7 text-center lg:text-left">
+          <div class="inline-flex items-center gap-2 bg-white px-4 py-1.5 rounded-full shadow-sm border border-neutral-100 text-poke-red font-bold text-xs md:text-sm mb-6 animate-bounce">
+            <span class="flex h-2 w-2 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-poke-red opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-poke-red"></span>
+            </span>
+            어른과 아이가 함께 만드는 새로운 세상
+          </div>
+          
+          <h1 class="font-title text-4xl sm:text-5xl md:text-6xl text-poke-dark leading-tight mb-6">
+            어린이와 어른 둘다<br class="hidden sm:inline"> 즐기는 카드게임이<br>
+            <span class="text-poke-red relative inline-block">
+              세상을 바꾼다!
+              <span class="absolute left-0 bottom-1 w-full h-2 bg-red-200 -z-10"></span>
+            </span>
+          </h1>
+          
+          <p class="text-neutral-600 text-base sm:text-lg md:text-xl font-normal leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
+            애니메이션의 추억을 간직한 <span class="font-bold text-neutral-800">어른</span>부터, <br class="sm:hidden">
+            포켓몬 세계에 빠져든 <span class="font-bold text-neutral-800">어린이</span>까지! <br>
+            함께 교감하고, 두뇌를 펼치는 세대 초월의 배틀을 지금 시작하세요.
+          </p>
+          
+          <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+            <a href="#intro" class="bg-poke-red text-white font-bold text-base px-8 py-4 rounded-full shadow-lg hover:bg-red-700 transition-all transform hover:-translate-y-1 text-center">
+              포켓몬 카드 월드 탐험하기
+            </a>
+            <a href="#attraction" class="bg-white text-poke-dark border-2 border-neutral-200 font-bold text-base px-8 py-4 rounded-full shadow-sm hover:border-poke-red hover:text-poke-red transition-all transform hover:-translate-y-1 text-center">
+              핵심 매력 알아보기
+            </a>
+          </div>
+        </div>
+
+        <!-- Visual Content (놀고 다니는 포켓몬 테마) -->
+        <div class="lg:col-span-5 relative flex justify-center items-center h-[350px] sm:h-[450px]">
+          <!-- Interactive Playground Frame -->
+          <div class="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-red-100/50 -z-10 animate-pulse"></div>
+          
+          <!-- Cute Pokemon Visual 1: Pikachu Sparkle -->
+          <div class="absolute top-10 left-4 sm:left-10 bg-white p-4 rounded-2xl shadow-xl animate-bounce-gentle border border-neutral-100 flex flex-col items-center w-36">
+            <div class="w-20 h-20 bg-yellow-100 rounded-xl mb-2 flex items-center justify-center text-4xl">
+              ⚡
+            </div>
+            <span class="text-xs font-bold text-neutral-500">전기 타입</span>
+            <span class="text-sm font-bold text-neutral-800">피카츄</span>
+          </div>
+
+          <!-- Cute Pokemon Visual 2: Charmander Flame -->
+          <div class="absolute bottom-12 right-4 sm:right-10 bg-white p-4 rounded-2xl shadow-xl animate-float-slow border border-neutral-100 flex flex-col items-center w-36">
+            <div class="w-20 h-20 bg-orange-100 rounded-xl mb-2 flex items-center justify-center text-4xl">
+              🔥
+            </div>
+            <span class="text-xs font-bold text-neutral-500">불꽃 타입</span>
+            <span class="text-sm font-bold text-neutral-800">파이리</span>
+          </div>
+
+          <!-- Cute Pokemon Visual 3: Squirtle Water -->
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-3xl shadow-2xl border-2 border-poke-red flex flex-col items-center w-48 z-10">
+            <span class="absolute top-3 right-3 text-poke-red animate-ping"><i class="fa-solid fa-heart text-xs"></i></span>
+            <div class="w-28 h-28 bg-blue-100 rounded-2xl mb-3 flex items-center justify-center text-6xl">
+              🐢
+            </div>
+            <span class="text-xs font-bold text-blue-600 mb-0.5">물 타입 #0007</span>
+            <span class="text-lg font-title text-neutral-800">꼬부기</span>
+            <span class="text-xs text-neutral-400 mt-1">"사랑스러운 귀염둥이!"</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Section Divider (Wave) -->
+    <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none transform rotate-180">
+      <svg class="relative block w-full h-12 text-white" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V120H0C51.65,103,119.51,95,179.66,85.62,238.45,76.47,262.11,64,321.39,56.44Z" fill="currentColor"></path>
+      </svg>
+    </div>
+  </section>
+
+
+  <!-- SECTION 2: 소개 (귀여운 포켓몬 카드로 배틀하기) -->
+  <section id="intro" class="py-20 md:py-32 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Section Title -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="font-title text-3xl sm:text-4xl md:text-5xl text-poke-dark mb-4">
+          귀여운 카드 속 숨겨진 <span class="text-poke-red">엄청난 전략!</span>
+        </h2>
+        <div class="w-16 h-1 bg-poke-red mx-auto mb-6"></div>
+        <p class="text-neutral-600 text-base sm:text-lg">
+          포켓몬 카드는 단순히 수집하는 즐거움을 넘어, 자신만의 덱을 구성하고 상대를 공략하는 본격적인 트레이딩 카드 게임(TCG)입니다. 귀여운 비주얼 뒤에 숨겨진 치열하고 짜릿한 배틀의 세계를 느껴보세요!
+        </p>
+      </div>
+
+      <!-- Battle Overview Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <!-- Battle Mechanics Visualization -->
+        <div class="lg:col-span-6 bg-gradient-to-tr from-neutral-50 to-red-50/40 p-6 sm:p-10 rounded-3xl border border-neutral-100 shadow-xl relative overflow-hidden">
+          <div class="absolute -top-10 -left-10 w-40 h-40 bg-poke-red/5 rounded-full"></div>
+          
+          <!-- VS Simulation -->
+          <div class="flex flex-col gap-6 relative z-10">
+            <!-- Opponent Card -->
+            <div class="flex justify-end transform -rotate-2 hover:rotate-0 transition-transform">
+              <div class="bg-white border-2 border-purple-500 rounded-2xl p-4 shadow-lg w-56 flex items-center gap-3">
+                <div class="text-3xl">😈</div>
+                <div>
+                  <div class="font-bold text-sm">팬텀 ex</div>
+                  <div class="text-[10px] text-purple-500 font-bold">HP 320 • 초타입</div>
+                  <div class="w-24 h-1 bg-purple-200 rounded-full mt-1.5 overflow-hidden">
+                    <div class="bg-purple-500 h-full w-[80%]"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- VS Badge -->
+            <div class="flex justify-center my-2">
+              <span class="font-title bg-poke-red text-white px-4 py-2 rounded-full text-lg shadow-md border-2 border-white animate-pulse">VS</span>
+            </div>
+
+            <!-- Player Card -->
+            <div class="flex justify-start transform rotate-3 hover:rotate-0 transition-transform">
+              <div class="bg-white border-4 border-yellow-400 rounded-2xl p-4 shadow-xl w-56 flex items-center gap-3 relative">
+                <div class="absolute -top-3 -right-3 bg-yellow-400 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">ACTIVE</div>
+                <div class="text-3xl">⚡</div>
+                <div>
+                  <div class="font-bold text-sm">피카츄 ex</div>
+                  <div class="text-[10px] text-yellow-600 font-bold">HP 200 • 번개타입</div>
+                  <div class="w-24 h-1 bg-yellow-200 rounded-full mt-1.5 overflow-hidden">
+                    <div class="bg-yellow-400 h-full w-[95%]"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Strategy Description Text -->
+        <div class="lg:col-span-6 space-y-6">
+          <h3 class="text-2xl sm:text-3xl font-bold text-poke-dark leading-snug">
+            룰은 간단하게, <br class="sm:hidden"><span class="text-poke-red">플레이는 깊이 있게!</span>
+          </h3>
+          <p class="text-neutral-600 text-sm sm:text-base leading-relaxed">
+            포켓몬 카드 게임은 각 60장의 카드로 구성된 덱을 사용하여 배틀 필드에서 상대를 제압하는 지적 스포츠입니다. 귀여운 포켓몬들을 진화시키고, 에너지를 붙여 강력한 기술을 발동하세요! 어른들에게는 뛰어난 두뇌 싸움을, 아이들에게는 수학적 사고와 문제해결력을 길러주는 검증된 에듀게임입니다.
+          </p>
+
+          <!-- Key Game Step Points -->
+          <div class="space-y-4 pt-2">
+            <div class="flex gap-4 items-start">
+              <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-poke-red font-bold">1</div>
+              <div>
+                <h4 class="font-bold text-neutral-800">나만의 포켓몬 덱 구성</h4>
+                <p class="text-neutral-500 text-xs sm:text-sm">수천 장의 카드 중 나와 어울리는 포켓몬 파트너를 선택하고 전략적인 트레이너스 카드와 에너지를 조합해보세요.</p>
+              </div>
+            </div>
+            <div class="flex gap-4 items-start">
+              <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-poke-red font-bold">2</div>
+              <div>
+                <h4 class="font-bold text-neutral-800">치열한 상성 및 진화 배틀</h4>
+                <p class="text-neutral-500 text-xs sm:text-sm">타입 상성을 활용해 불리한 상황을 뒤집고, 기본 포켓몬을 강력한 ex 카드나 테라스탈 카드로 진화시켜 압도하세요.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- SECTION 3: 핵심 매력 포인트 카드 2개 -->
+  <section id="attraction" class="py-20 md:py-32 bg-neutral-50 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      
+      <!-- Section Title -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-poke-red font-bold uppercase tracking-widest text-sm">Why We Love Pokémon Card?</span>
+        <h2 class="font-title text-3xl sm:text-4xl md:text-5xl text-poke-dark mt-2 mb-4">
+          포켓몬 카드의 <span class="text-poke-red">2가지 핵심 매력</span>
+        </h2>
+        <div class="w-16 h-1 bg-poke-red mx-auto"></div>
+      </div>
+
+      <!-- Feature Cards Layout -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto">
+        
+        <!-- Feature Card 1: 귀여운 포켓몬 카드들 -->
+        <div class="group bg-white rounded-3xl overflow-hidden shadow-xl border border-neutral-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full">
+          <!-- Card Image Container -->
+          <div class="relative h-64 bg-yellow-50 overflow-hidden flex items-center justify-center">
+            <!-- Abstract decorative elements -->
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-yellow-100 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+            <!-- Heart icon inside -->
+            <span class="absolute top-6 right-6 text-poke-red text-2xl animate-pulse"><i class="fa-solid fa-heart"></i></span>
+            
+            <!-- SVG Illustration of Cute Card -->
+            <div class="relative z-10 w-44 h-56 bg-white rounded-2xl border-4 border-yellow-400 p-3 shadow-md flex flex-col justify-between transform -rotate-3 group-hover:rotate-0 transition-transform duration-300">
+              <div class="flex justify-between items-center text-[10px] font-bold text-yellow-600">
+                <span>기본 포켓몬</span>
+                <span>HP 60 ⚡</span>
+              </div>
+              <div class="bg-yellow-50 rounded-xl h-28 flex items-center justify-center text-5xl">
+                🐱
+              </div>
+              <div class="text-center">
+                <div class="font-title text-sm text-neutral-800">에몬가</div>
+                <div class="text-[9px] text-neutral-400">하늘을 나는 귀여운 다람쥐</div>
+              </div>
+              <div class="border-t border-yellow-200 pt-1 text-center text-[9px] text-yellow-600 font-semibold">
+                볼부비부비 10
+              </div>
+            </div>
+          </div>
+          
+          <!-- Card Body -->
+          <div class="p-8 flex-grow flex flex-col">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 bg-red-100 text-poke-red rounded-full flex items-center justify-center font-bold">01</div>
+              <h3 class="text-xl sm:text-2xl font-bold text-poke-dark">소장 욕구를 부르는 귀여움</h3>
+            </div>
+            <p class="text-neutral-600 text-sm sm:text-base leading-relaxed flex-grow">
+              포켓몬 카드는 전 세계 저명한 아티스트들이 그린 한 폭의 작품입니다. 터치감이 느껴지는 고품질 일러스트, 반짝이는 홀로그램 기법, 그리고 포켓몬 특유의 귀엽고 역동적인 모습이 카드 한 장 한 장에 완벽하게 담겨 있어, 소장하는 것만으로도 가슴 벅찬 만족감을 선사합니다.
+            </p>
+            <div class="mt-6 pt-4 border-t border-neutral-100 flex items-center justify-between text-xs sm:text-sm text-neutral-500">
+              <span>#귀여운일러스트</span>
+              <span>#소장가치100%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature Card 2: 어린와 어른 둘다 즐기는 게임 -->
+        <div class="group bg-white rounded-3xl overflow-hidden shadow-xl border border-neutral-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full">
+          <!-- Card Image Container -->
+          <div class="relative h-64 bg-red-50 overflow-hidden flex items-center justify-center">
+            <!-- Abstract decorative elements -->
+            <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-red-100 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+            <!-- Star icon inside -->
+            <span class="absolute top-6 right-6 text-yellow-500 text-2xl"><i class="fa-solid fa-star animate-bounce"></i></span>
+            
+            <!-- Dual Silhouette/Emoji Illustration representing Generations -->
+            <div class="flex gap-4 relative z-10">
+              <!-- Adult representation -->
+              <div class="flex flex-col items-center bg-white p-4 rounded-2xl shadow-md w-24 transform -rotate-6 group-hover:rotate-0 transition-transform duration-300">
+                <span class="text-4xl mb-1">🧑‍💻</span>
+                <span class="text-xs font-bold text-neutral-800">어른 (추억)</span>
+              </div>
+              <!-- Child representation -->
+              <div class="flex flex-col items-center bg-white p-4 rounded-2xl shadow-md w-24 transform rotate-6 group-hover:rotate-0 transition-transform duration-300">
+                <span class="text-4xl mb-1">👦</span>
+                <span class="text-xs font-bold text-neutral-800">아이 (현재)</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Card Body -->
+          <div class="p-8 flex-grow flex flex-col">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 bg-red-100 text-poke-red rounded-full flex items-center justify-center font-bold">02</div>
+              <h3 class="text-xl sm:text-2xl font-bold text-poke-dark">소통을 이어주는 세대 초월 게임</h3>
+            </div>
+            <p class="text-neutral-600 text-sm sm:text-base leading-relaxed flex-grow">
+              포켓몬 카드는 세대 간의 벽을 허무는 특별한 매개체입니다. 90년대 포켓몬스터 애니메이션을 보고 자란 부모가 지금 포켓몬을 좋아하는 자녀와 같은 룰로 게임을 하며 자연스럽게 소통하고 교감할 수 있습니다. 지혜로운 어른과 기발한 아이들의 멋진 한판 승부가 펼쳐집니다!
+            </p>
+            <div class="mt-6 pt-4 border-t border-neutral-100 flex items-center justify-between text-xs sm:text-sm text-neutral-500">
+              <span>#세대공감</span>
+              <span>#온가족보드게임</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- SECTION 4: 카드팩 시리즈 카드로 배치 (interactive flip card 포함) -->
+  <section id="packs" class="py-20 md:py-32 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Section Title -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-poke-red font-bold uppercase tracking-widest text-sm">Line-Up Series</span>
+        <h2 class="font-title text-3xl sm:text-4xl md:text-5xl text-poke-dark mt-2 mb-4">
+          대표 인기 카드팩 라인업
+        </h2>
+        <div class="w-16 h-1 bg-poke-red mx-auto mb-6"></div>
+        <p class="text-neutral-600 text-base sm:text-lg">
+          지금 가장 핫한 포켓몬 카드팩을 소개합니다! 마우스를 올리거나 카드를 터치하면 카드 속 보물 같은 메인 포켓몬이 등장합니다.
+        </p>
+      </div>
+
+      <!-- Card Packs Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        <!-- Pack Card 1 -->
+        <div class="perspective-1000 card-hover h-[480px]">
+          <div class="relative w-full h-full card-inner duration-500">
+            <!-- Front of the Card Pack -->
+            <div class="absolute w-full h-full card-front bg-gradient-to-b from-red-600 to-red-800 rounded-3xl p-6 shadow-xl flex flex-col justify-between border-4 border-poke-red text-white">
+              <div class="flex justify-between items-start">
+                <span class="text-xs bg-yellow-400 text-poke-dark font-bold px-3 py-1 rounded-full uppercase tracking-wider">NEW PACK</span>
+                <span class="text-xl">⭐</span>
+              </div>
+              <div class="text-center flex flex-col items-center">
+                <!-- SVG Booster Pack Graphic -->
+                <div class="w-32 h-44 bg-red-500/80 rounded-xl border-2 border-white/30 flex items-center justify-center text-7xl shadow-inner mb-4 relative overflow-hidden">
+                  <div class="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent"></div>
+                  🔥
+                </div>
+                <h3 class="font-title text-2xl tracking-wide">와일드포스</h3>
+                <p class="text-xs text-red-200 mt-1">고대 포켓몬들의 위대한 각성!</p>
+              </div>
+              <div class="text-center bg-red-900/40 py-2.5 rounded-2xl border border-red-500/30 text-xs font-bold text-red-100">
+                마우스를 올리면 카드 공개 ➔
+              </div>
+            </div>
+            
+            <!-- Back of the Card Pack (The Secret Rare Card inside) -->
+            <div class="absolute w-full h-full card-back bg-neutral-900 rounded-3xl p-6 shadow-xl flex flex-col justify-between border-4 border-yellow-400 text-white overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-tr from-yellow-500/10 to-transparent"></div>
+              <div class="flex justify-between items-center text-xs text-yellow-400 font-bold relative z-10">
+                <span>SUPER RARE (SR)</span>
+                <span>HP 230 ⚔️</span>
+              </div>
+              <div class="flex-grow flex flex-col items-center justify-center py-6 relative z-10">
+                <div class="w-36 h-36 rounded-full bg-gradient-to-br from-yellow-300 to-amber-500 flex items-center justify-center text-7xl shadow-2xl mb-4 animate-bounce-gentle">
+                  🦁
+                </div>
+                <h4 class="font-title text-xl text-yellow-400">굽이치는물결 ex</h4>
+                <p class="text-[11px] text-neutral-400 mt-1 text-center">"고대의 활력이 가득 차오른 화수분!"</p>
+              </div>
+              <div class="bg-yellow-400 text-neutral-900 text-center py-2 rounded-xl text-xs font-bold relative z-10">
+                수집 난이도: ★★★★★
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pack Card 2 -->
+        <div class="perspective-1000 card-hover h-[480px]">
+          <div class="relative w-full h-full card-inner duration-500">
+            <!-- Front of the Card Pack -->
+            <div class="absolute w-full h-full card-front bg-gradient-to-b from-blue-600 to-blue-800 rounded-3xl p-6 shadow-xl flex flex-col justify-between border-4 border-blue-600 text-white">
+              <div class="flex justify-between items-start">
+                <span class="text-xs bg-yellow-400 text-poke-dark font-bold px-3 py-1 rounded-full uppercase tracking-wider">HOT PACK</span>
+                <span class="text-xl">🌟</span>
+              </div>
+              <div class="text-center flex flex-col items-center">
+                <!-- SVG Booster Pack Graphic -->
+                <div class="w-32 h-44 bg-blue-500/80 rounded-xl border-2 border-white/30 flex items-center justify-center text-7xl shadow-inner mb-4 relative overflow-hidden">
+                  <div class="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent"></div>
+                  ⚡
+                </div>
+                <h3 class="font-title text-2xl tracking-wide">사이버저지</h3>
+                <p class="text-xs text-blue-200 mt-1">미래에서 날아온 메카닉 배틀!</p>
+              </div>
+              <div class="text-center bg-blue-900/40 py-2.5 rounded-2xl border border-blue-500/30 text-xs font-bold text-blue-100">
+                마우스를 올리면 카드 공개 ➔
+              </div>
+            </div>
+            
+            <!-- Back of the Card Pack (The Secret Rare Card inside) -->
+            <div class="absolute w-full h-full card-back bg-neutral-900 rounded-3xl p-6 shadow-xl flex flex-col justify-between border-4 border-cyan-400 text-white overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 to-transparent"></div>
+              <div class="flex justify-between items-center text-xs text-cyan-400 font-bold relative z-10">
+                <span>ULTRA RARE (UR)</span>
+                <span>HP 220 🔋</span>
+              </div>
+              <div class="flex-grow flex flex-col items-center justify-center py-6 relative z-10">
+                <div class="w-36 h-36 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-7xl shadow-2xl mb-4 animate-float-slow">
+                  🤖
+                </div>
+                <h4 class="font-title text-xl text-cyan-400">무쇠잎새 ex</h4>
+                <p class="text-[11px] text-neutral-400 mt-1 text-center">"최첨단 과학 기술로 업그레이드된 칼날"</p>
+              </div>
+              <div class="bg-cyan-400 text-neutral-900 text-center py-2 rounded-xl text-xs font-bold relative z-10">
+                수집 난이도: ★★★★★
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pack Card 3 -->
+        <div class="perspective-1000 card-hover h-[480px]">
+          <div class="relative w-full h-full card-inner duration-500">
+            <!-- Front of the Card Pack -->
+            <div class="absolute w-full h-full card-front bg-gradient-to-b from-amber-600 to-amber-800 rounded-3xl p-6 shadow-xl flex flex-col justify-between border-4 border-amber-600 text-white">
+              <div class="flex justify-between items-start">
+                <span class="text-xs bg-yellow-400 text-poke-dark font-bold px-3 py-1 rounded-full uppercase tracking-wider">POPULAR</span>
+                <span class="text-xl">✨</span>
+              </div>
+              <div class="text-center flex flex-col items-center">
+                <!-- SVG Booster Pack Graphic -->
+                <div class="w-32 h-44 bg-amber-500/80 rounded-xl border-2 border-white/30 flex items-center justify-center text-7xl shadow-inner mb-4 relative overflow-hidden">
+                  <div class="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent"></div>
+                  🌀
+                </div>
+                <h3 class="font-title text-2xl tracking-wide">클레이버스트</h3>
+                <p class="text-xs text-amber-200 mt-1">대지를 요동치게 만드는 파워!</p>
+              </div>
+              <div class="text-center bg-amber-900/40 py-2.5 rounded-2xl border border-amber-500/30 text-xs font-bold text-amber-100">
+                마우스를 올리면 카드 공개 ➔
+              </div>
+            </div>
+            
+            <!-- Back of the Card Pack (The Secret Rare Card inside) -->
+            <div class="absolute w-full h-full card-back bg-neutral-900 rounded-3xl p-6 shadow-xl flex flex-col justify-between border-4 border-amber-400 text-white overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-tr from-amber-500/10 to-transparent"></div>
+              <div class="flex justify-between items-center text-xs text-amber-400 font-bold relative z-10">
+                <span>SECRET SPECIAL (SAR)</span>
+                <span>HP 340 💎</span>
+              </div>
+              <div class="flex-grow flex flex-col items-center justify-center py-6 relative z-10">
+                <div class="w-36 h-36 rounded-full bg-gradient-to-br from-amber-300 to-orange-500 flex items-center justify-center text-7xl shadow-2xl mb-4 animate-bounce-gentle">
+                  🦖
+                </div>
+                <h4 class="font-title text-xl text-amber-400">딩루 ex</h4>
+                <p class="text-[11px] text-neutral-400 mt-1 text-center">"견고한 토기로 모든 충격을 흡수한다"</p>
+              </div>
+              <div class="bg-amber-400 text-neutral-900 text-center py-2 rounded-xl text-xs font-bold relative z-10">
+                수집 난이도: ★★★★★★
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quick Play Guide / Interactive Simulation Link -->
+      <div class="mt-16 bg-neutral-50 rounded-3xl p-8 md:p-12 text-center border border-neutral-100 shadow-md">
+        <h3 class="text-2xl font-bold text-poke-dark mb-4">카드를 처음 만져보시나요? </h3>
+        <p class="text-neutral-600 max-w-2xl mx-auto mb-6 text-sm sm:text-base">
+          걱정하지 마세요! 포켓몬 카드 게임 공식 채널 및 매장에서 완전 기초부터 차근차근 배울 수 있는 "티칭교실"이 매주 무료로 운영되고 있습니다. 가족과 함께 오셔서 카드와 룰을 선물로 받아가세요!
+        </p>
+        <a href="#footer" class="inline-flex items-center gap-2 text-poke-red font-bold hover:underline transition-all">
+          가까운 공인 공인카드샵 및 티칭이벤트 확인하기 <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- FOOTER - 공식 사이트 링크 / 문의처 -->
+  <footer id="footer" class="bg-poke-dark text-white pt-16 pb-8 border-t-8 border-poke-red">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Footer Top Content -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-12 pb-12 border-b border-neutral-800">
+        <!-- Brand & Catchphrase -->
+        <div class="md:col-span-6 space-y-4">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-white rounded-full border-2 border-black flex items-center justify-center overflow-hidden">
+              <div class="w-full h-1/2 bg-poke-red"></div>
+            </div>
+            <span class="font-title text-xl tracking-wider">
+              POKÉMON <span class="text-poke-red">CARD</span>
+            </span>
+          </div>
+          <p class="text-neutral-400 text-sm max-w-sm leading-relaxed">
+            "어린이와 어른 둘다 즐기는 카드게임이 세상을 바꾼다"<br>
+            포켓몬 카드는 전 세대를 하나로 묶고 교감할 수 있는 따뜻한 여가 문화를 만듭니다.
+          </p>
+        </div>
+
+        <!-- Official Links -->
+        <div class="md:col-span-3">
+          <h4 class="font-bold text-sm text-neutral-200 uppercase tracking-wider mb-4">공식 채널 바로가기</h4>
+          <ul class="space-y-2 text-sm text-neutral-400">
+            <li>
+              <a href="#" class="hover:text-poke-red transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-globe w-4"></i> 포켓몬 코리아 공식 사이트
+              </a>
+            </li>
+            <li>
+              <a href="#" class="hover:text-poke-red transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-store w-4"></i> 포켓몬 온라인 스토어
+              </a>
+            </li>
+            <li>
+              <a href="#" class="hover:text-poke-red transition-colors flex items-center gap-2">
+                <i class="fa-brands fa-youtube w-4"></i> 공식 유튜브 채널
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Support & Inquiries -->
+        <div class="md:col-span-3">
+          <h4 class="font-bold text-sm text-neutral-200 uppercase tracking-wider mb-4">고객지원 및 문의</h4>
+          <ul class="space-y-2 text-sm text-neutral-400">
+            <li class="flex items-center gap-2">
+              <i class="fa-solid fa-phone w-4"></i> 1588-XXXX (평일 09~18시)
+            </li>
+            <li class="flex items-center gap-2">
+              <i class="fa-solid fa-envelope w-4"></i> support@pokemoncard.co.kr
+            </li>
+            <li class="flex items-center gap-2">
+              <i class="fa-solid fa-location-dot w-4"></i> 서울시 강남구 테헤란로 XXX
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer Bottom Copyright & Disclaimer -->
+      <div class="pt-8 text-center md:flex md:justify-between md:items-center text-xs text-neutral-500">
+        <p>© 2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc.</p>
+        <p class="mt-2 md:mt-0">본 페이지는 포켓몬 카드 홍보를 위한 팬 메이드 콘셉트 반응형 랜딩 페이지입니다.</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- MOBILE MENU TOGGLE SCRIPT -->
+  <script>
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    function toggleMenu() {
+      mobileMenu.classList.toggle('hidden');
+    }
+
+    menuBtn.addEventListener('click', toggleMenu);
+  </script>
+
+</body>
+</html>
