@@ -164,11 +164,14 @@
 
       <!-- Desktop Navigation -->
       <nav class="hidden md:flex items-center gap-8 font-medium text-neutral-700 dark:text-neutral-300">
-        <a href="#playground" class="hover:text-poke-red dark:hover:text-poke-red transition-colors">포켓몬 놀이터</a>
-        <a href="#intro" class="hover:text-poke-red dark:hover:text-poke-red transition-colors">배틀 소개</a>
-        <a href="#attraction" class="hover:text-poke-red dark:hover:text-poke-red transition-colors">핵심 매력</a>
-        <a href="#packs" class="hover:text-poke-red dark:hover:text-poke-red transition-colors">카드팩 라인업</a>
-        <a href="#share-board" class="hover:text-poke-red dark:hover:text-poke-red transition-colors">카드 제보방</a>
+        <a href="#playground" class="hover:text-poke-red dark:hover:text-poke-red transition-colors" data-i18n data-ko="포켓몬 놀이터" data-en="Pokémon Playground">포켓몬 놀이터</a>
+        <a href="#intro" class="hover:text-poke-red dark:hover:text-poke-red transition-colors" data-i18n data-ko="배틀 소개" data-en="Battle Overview">배틀 소개</a>
+        <a href="#attraction" class="hover:text-poke-red dark:hover:text-poke-red transition-colors" data-i18n data-ko="핵심 매력" data-en="Key Attractions">핵심 매력</a>
+        <a href="#packs" class="hover:text-poke-red dark:hover:text-poke-red transition-colors" data-i18n data-ko="카드팩 라인업" data-en="Pack Lineup">카드팩 라인업</a>
+        <a href="#share-board" class="hover:text-poke-red dark:hover:text-poke-red transition-colors" data-i18n data-ko="카드 제보방" data-en="Card Showcase">카드 제보방</a>
+        <a href="https://www.pokemonstore.co.kr/" target="_blank" rel="noopener noreferrer" class="text-poke-red hover:underline transition-all flex items-center gap-1.5 font-bold" data-i18n data-ko="공식 숍" data-en="Official Store">
+          <i class="fa-solid fa-store text-xs animate-pulse"></i> 공식 숍
+        </a>
       </nav>
 
       <!-- Theme Toggle & CTA Buttons Group -->
@@ -178,9 +181,13 @@
           <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
         </button>
 
+        <button id="lang-toggle" class="px-3 py-2 rounded-full text-sm font-bold text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-300 focus:outline-none" aria-label="언어 전환">
+          <span id="lang-toggle-label">EN</span>
+        </button>
+
         <!-- CTA Button (Desktop) -->
         <div class="hidden sm:block">
-          <a href="#packs" class="bg-poke-red text-white font-bold px-5 py-2.5 rounded-full shadow-lg hover:bg-red-700 transition-all transform hover:scale-105 inline-flex items-center gap-2 text-sm">
+          <a href="#packs" class="bg-poke-red text-white font-bold px-5 py-2.5 rounded-full shadow-lg hover:bg-red-700 transition-all transform hover:scale-105 inline-flex items-center gap-2 text-sm" data-i18n data-ko="카드 배틀 시작하기" data-en="Start the Battle">
             <i class="fa-solid fa-gamepad"></i> 카드 배틀 시작하기
           </a>
         </div>
@@ -194,12 +201,12 @@
 
     <!-- Mobile Menu (Floating Dropdown Overlay) -->
     <div id="mobile-menu" class="hidden absolute top-20 left-0 w-full bg-white dark:bg-neutral-900 border-b-2 border-neutral-100 dark:border-neutral-800 px-6 py-5 space-y-4 shadow-xl z-40 transition-colors duration-500">
-      <a href="#playground" class="block font-medium py-2.5 text-lg border-b border-neutral-50 dark:border-neutral-800 hover:text-poke-red dark:text-neutral-200" onclick="toggleMenu()">포켓몬 놀이터</a>
-      <a href="#intro" class="block font-medium py-2.5 text-lg border-b border-neutral-50 dark:border-neutral-800 hover:text-poke-red dark:text-neutral-200" onclick="toggleMenu()">배틀 소개</a>
-      <a href="#attraction" class="block font-medium py-2.5 text-lg border-b border-neutral-50 dark:border-neutral-800 hover:text-poke-red dark:text-neutral-200" onclick="toggleMenu()">핵심 매력</a>
-      <a href="#packs" class="block font-medium py-2.5 text-lg border-b border-neutral-50 dark:border-neutral-800 hover:text-poke-red dark:text-neutral-200" onclick="toggleMenu()">카드팩 라인업</a>
-      <a href="#share-board" class="block font-medium py-2.5 text-lg border-b border-neutral-50 dark:border-neutral-800 hover:text-poke-red dark:text-neutral-200" onclick="toggleMenu()">카드 제보방</a>
-      <a href="#packs" class="block bg-poke-red text-white text-center font-bold py-3.5 rounded-full shadow-md text-base" onclick="toggleMenu()">카드 배틀 시작하기</a>
+      <a href="#playground" class="block font-medium py-2.5 text-lg border-b border-neutral-50 dark:border-neutral-800 hover:text-poke-red dark:text-neutral-200" onclick="toggleMenu()" data-i18n data-ko="포켓몬 놀이터" data-en="Pokémon Playground">포켓몬 놀이터</a>
+      <a href="#intro" class="block font-medium py-2.5 text-lg border-b border-neutral-50 dark:border-neutral-800 hover:text-poke-red dark:text-neutral-200" onclick="toggleMenu()" data-i18n data-ko="배틀 소개" data-en="Battle Overview">배틀 소개</a>
+      <a href="#attraction" class="block font-medium py-2.5 text-lg border-b border-neutral-50 dark:border-neutral-800 hover:text-poke-red dark:text-neutral-200" onclick="toggleMenu()" data-i18n data-ko="핵심 매력" data-en="Key Attractions">핵심 매력</a>
+      <a href="#packs" class="block font-medium py-2.5 text-lg border-b border-neutral-50 dark:border-neutral-800 hover:text-poke-red dark:text-neutral-200" onclick="toggleMenu()" data-i18n data-ko="카드팩 라인업" data-en="Pack Lineup">카드팩 라인업</a>
+      <a href="#share-board" class="block font-medium py-2.5 text-lg border-b border-neutral-50 dark:border-neutral-800 hover:text-poke-red dark:text-neutral-200" onclick="toggleMenu()" data-i18n data-ko="카드 제보방" data-en="Card Showcase">카드 제보방</a>
+      <a href="#packs" class="block bg-poke-red text-white text-center font-bold py-3.5 rounded-full shadow-md text-base" onclick="toggleMenu()" data-i18n data-ko="카드 배틀 시작하기" data-en="Start the Battle">카드 배틀 시작하기</a>
     </div>
   </header>
 
@@ -223,28 +230,29 @@
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-poke-red opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-poke-red"></span>
             </span>
-            어른과 아이가 함께 만드는 새로운 세상
+            <span data-i18n data-ko="어른과 아이가 함께 만드는 새로운 세상" data-en="A new world shaped together by adults and children">어른과 아이가 함께 만드는 새로운 세상</span>
           </div>
           
           <h1 class="font-title text-3xl sm:text-5xl md:text-6xl text-poke-dark dark:text-white leading-tight mb-6">
-            어린이와 어른 둘 다<br class="hidden sm:inline"> 즐기는 카드게임이<br>
+            <span data-i18n data-ko="어린이와 어른 둘 다" data-en="A card game enjoyed by both children and adults">어린이와 어른 둘 다</span><br class="hidden sm:inline"> 
+            <span data-i18n data-ko="즐기는 카드게임이" data-en="that both generations enjoy">즐기는 카드게임이</span><br>
             <span class="text-poke-red relative inline-block">
-              세상을 바꾼다!
+              <span data-i18n data-ko="세상을 바꾼다!" data-en="changes the world!">세상을 바꾼다!</span>
               <span class="absolute left-0 bottom-1 w-full h-2 bg-red-200 dark:bg-red-950 -z-10"></span>
             </span>
           </h1>
           
           <p class="text-neutral-600 dark:text-neutral-300 text-sm sm:text-base md:text-xl font-normal leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
-            애니메이션의 추억을 간직한 <span class="font-bold text-neutral-800 dark:text-white">어른</span>부터, <br class="sm:hidden">
-            포켓몬 세계에 빠져든 <span class="font-bold text-neutral-800 dark:text-white">어린이</span>까지! <br>
-            함께 교감하고, 두뇌를 펼치는 세대 초월의 배틀을 지금 시작하세요.
+            <span data-i18n data-ko="애니메이션의 추억을 간직한" data-en="From adults who cherish the memories of animation,">애니메이션의 추억을 간직한</span> <span class="font-bold text-neutral-800 dark:text-white" data-i18n data-ko="어른" data-en="adults">어른</span>부터, <br class="sm:hidden">
+            <span data-i18n data-ko="포켓몬 세계에 빠져든" data-en="to children who are captivated by the Pokémon world,">포켓몬 세계에 빠져든</span> <span class="font-bold text-neutral-800 dark:text-white" data-i18n data-ko="어린이" data-en="children">어린이</span>까지! <br>
+            <span data-i18n data-ko="함께 교감하고, 두뇌를 펼치는 세대 초월의 배틀을 지금 시작하세요." data-en="Start a cross-generational battle of connection and strategy right now.">함께 교감하고, 두뇌를 펼치는 세대 초월의 배틀을 지금 시작하세요.</span>
           </p>
           
           <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 px-4 sm:px-0">
-            <a href="#intro" class="bg-poke-red text-white font-bold text-base px-8 py-4 rounded-full shadow-lg hover:bg-red-700 transition-all transform hover:-translate-y-1 text-center">
+            <a href="#intro" class="bg-poke-red text-white font-bold text-base px-8 py-4 rounded-full shadow-lg hover:bg-red-700 transition-all transform hover:-translate-y-1 text-center" data-i18n data-ko="포켓몬 카드 월드 탐험하기" data-en="Explore the Pokémon Card World">
               포켓몬 카드 월드 탐험하기
             </a>
-            <a href="#attraction" class="bg-white dark:bg-neutral-800 text-poke-dark dark:text-white border-2 border-neutral-200 dark:border-neutral-700 font-bold text-base px-8 py-4 rounded-full shadow-sm hover:border-poke-red hover:text-poke-red transition-all transform hover:-translate-y-1 text-center">
+            <a href="#attraction" class="bg-white dark:bg-neutral-800 text-poke-dark dark:text-white border-2 border-neutral-200 dark:border-neutral-700 font-bold text-base px-8 py-4 rounded-full shadow-sm hover:border-poke-red hover:text-poke-red transition-all transform hover:-translate-y-1 text-center" data-i18n data-ko="핵심 매력 알아보기" data-en="Discover the Highlights">
               핵심 매력 알아보기
             </a>
           </div>
@@ -312,10 +320,10 @@
       <!-- Section Title -->
       <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16">
         <h2 class="font-title text-2xl sm:text-4xl md:text-5xl text-poke-dark dark:text-white mb-4 leading-snug">
-          귀여운 카드 속 숨겨진 <span class="text-poke-red">엄청난 전략!</span>
+          <span data-i18n data-ko="귀여운 카드 속 숨겨진" data-en="The adorable cards hide">귀여운 카드 속 숨겨진</span> <span class="text-poke-red" data-i18n data-ko="엄청난 전략!" data-en="an amazing strategy!">엄청난 전략!</span>
         </h2>
         <div class="w-16 h-1 bg-poke-red mx-auto mb-6"></div>
-        <p class="text-neutral-600 dark:text-neutral-300 text-sm sm:text-lg px-2 sm:px-0">
+        <p class="text-neutral-600 dark:text-neutral-300 text-sm sm:text-lg px-2 sm:px-0" data-i18n data-ko="포켓몬 카드는 단순히 수집하는 즐거움을 넘어, 자신만의 덱을 구성하고 상대를 공략하는 본격적인 트레이딩 카드 게임(TCG)입니다. 귀여운 비주얼 뒤에 숨겨진 치열하고 짜릿한 배틀의 세계를 느껴보세요!" data-en="Pokémon cards are more than collectibles; they are a full trading card game where you build your own deck, outplay opponents, and experience thrilling battles behind the cute visuals.">
           포켓몬 카드는 단순히 수집하는 즐거움을 넘어, 자신만의 덱을 구성하고 상대를 공략하는 본격적인 트레이딩 카드 게임(TCG)입니다. 귀여운 비주얼 뒤에 숨겨진 치열하고 짜릿한 배틀의 세계를 느껴보세요!
         </p>
       </div>
@@ -377,9 +385,9 @@
         <!-- Strategy Description Text -->
         <div class="lg:col-span-6 space-y-6 text-center lg:text-left mt-4 lg:mt-0">
           <h3 class="text-xl sm:text-3xl font-bold text-poke-dark dark:text-white leading-snug">
-            룰은 간단하게, <br><span class="text-poke-red">플레이는 깊이 있게!</span>
+            <span data-i18n data-ko="룰은 간단하게," data-en="The rules are simple,">룰은 간단하게,</span> <br><span class="text-poke-red" data-i18n data-ko="플레이는 깊이 있게!" data-en="but the play runs deep!">플레이는 깊이 있게!</span>
           </h3>
-          <p class="text-neutral-600 dark:text-neutral-300 text-xs sm:text-base leading-relaxed max-w-xl mx-auto lg:mx-0">
+          <p class="text-neutral-600 dark:text-neutral-300 text-xs sm:text-base leading-relaxed max-w-xl mx-auto lg:mx-0" data-i18n data-ko="포켓몬 카드 게임은 각 60장의 카드로 구성된 덱을 사용하여 배틀 필드에서 상대를 제압하는 지적 스포츠입니다. 귀여운 포켓몬들을 진화시키고, 에너지를 붙여 강력한 기술을 발동하세요! 어른들에게는 뛰어난 두뇌 싸움을, 아이들에게는 수학적 사고와 문제해결력을 길러주는 검증된 에듀게임입니다." data-en="Pokémon TCG is a strategic sport where you use a 60-card deck to outplay your opponent on the battlefield. Evolve your Pokémon, attach energy, and unleash powerful attacks. It is a proven edutainment game that sharpens adults' strategy and children's math and problem-solving skills.">
             포켓몬 카드 게임은 각 60장의 카드로 구성된 덱을 사용하여 배틀 필드에서 상대를 제압하는 지적 스포츠입니다. 귀여운 포켓몬들을 진화시키고, 에너지를 붙여 강력한 기술을 발동하세요! 어른들에게는 뛰어난 두뇌 싸움을, 아이들에게는 수학적 사고와 문제해결력을 길러주는 검증된 에듀게임입니다.
           </p>
 
@@ -388,15 +396,15 @@
             <div class="flex gap-3 sm:gap-4 items-start">
               <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-100 dark:bg-red-950/60 flex items-center justify-center text-poke-red font-bold text-sm sm:text-base">1</div>
               <div>
-                <h4 class="font-bold text-sm sm:text-base text-neutral-800 dark:text-white">나만의 포켓몬 덱 구성</h4>
-                <p class="text-neutral-500 dark:text-neutral-400 text-[11px] sm:text-sm mt-0.5">수천 장의 카드 중 나와 어울리는 포켓몬 파트너를 선택하고 전략적인 트레이너스 카드와 에너지를 조합해보세요.</p>
+                <h4 class="font-bold text-sm sm:text-base text-neutral-800 dark:text-white" data-i18n data-ko="나만의 포켓몬 덱 구성" data-en="Build Your Own Pokémon Deck">나만의 포켓몬 덱 구성</h4>
+                <p class="text-neutral-500 dark:text-neutral-400 text-[11px] sm:text-sm mt-0.5" data-i18n data-ko="수천 장의 카드 중 나와 어울리는 포켓몬 파트너를 선택하고 전략적인 트레이너스 카드와 에너지를 조합해보세요." data-en="Choose the Pokémon partner that fits you best from thousands of cards and combine it with strategic trainer cards and energy.">수천 장의 카드 중 나와 어울리는 포켓몬 파트너를 선택하고 전략적인 트레이너스 카드와 에너지를 조합해보세요.</p>
               </div>
             </div>
             <div class="flex gap-3 sm:gap-4 items-start">
               <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-100 dark:bg-red-950/60 flex items-center justify-center text-poke-red font-bold text-sm sm:text-base">2</div>
               <div>
-                <h4 class="font-bold text-sm sm:text-base text-neutral-800 dark:text-white">치열한 상성 및 진화 배틀</h4>
-                <p class="text-neutral-500 dark:text-neutral-400 text-[11px] sm:text-sm mt-0.5">타입 상성을 활용해 불리한 상황을 뒤집고, 기본 포켓몬을 강력한 ex 카드나 테라스탈 카드로 진화시켜 압도하세요.</p>
+                <h4 class="font-bold text-sm sm:text-base text-neutral-800 dark:text-white" data-i18n data-ko="치열한 상성 및 진화 배틀" data-en="Intense Type Matchups and Evolution Battles">치열한 상성 및 진화 배틀</h4>
+                <p class="text-neutral-500 dark:text-neutral-400 text-[11px] sm:text-sm mt-0.5" data-i18n data-ko="타입 상성을 활용해 불리한 상황을 뒤집고, 기본 포켓몬을 강력한 ex 카드나 테라스탈 카드로 진화시켜 압도하세요." data-en="Use type matchups to turn disadvantage into advantage, and evolve basic Pokémon into powerful ex or tera cards to dominate the game.">타입 상성을 활용해 불리한 상황을 뒤집고, 기본 포켓몬을 강력한 ex 카드나 테라스탈 카드로 진화시켜 압도하세요.</p>
               </div>
             </div>
           </div>
@@ -415,7 +423,7 @@
       <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16">
         <span class="text-poke-red font-bold uppercase tracking-widest text-xs sm:text-sm">Why We Love Pokémon Card?</span>
         <h2 class="font-title text-2xl sm:text-4xl md:text-5xl text-poke-dark dark:text-white mt-2 mb-4 leading-snug">
-          포켓몬 카드의 <span class="text-poke-red">2가지 핵심 매력</span>
+          <span data-i18n data-ko="포켓몬 카드의" data-en="Two key charms of Pokémon cards">포켓몬 카드의</span> <span class="text-poke-red" data-i18n data-ko="2가지 핵심 매력" data-en="that make it special">2가지 핵심 매력</span>
         </h2>
         <div class="w-16 h-1 bg-poke-red mx-auto"></div>
       </div>
@@ -458,9 +466,9 @@
           <div class="p-6 sm:p-8 flex-grow flex flex-col">
             <div class="flex items-center gap-2 sm:gap-3 mb-4">
               <div class="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 dark:bg-red-950/60 text-poke-red rounded-full flex items-center justify-center font-bold text-sm sm:text-base">01</div>
-              <h3 class="text-lg sm:text-2xl font-bold text-poke-dark dark:text-white">소장 욕구를 부르는 귀여움</h3>
+              <h3 class="text-lg sm:text-2xl font-bold text-poke-dark dark:text-white" data-i18n data-ko="소장 욕구를 부르는 귀여움" data-en="The charm that sparks collecting">소장 욕구를 부르는 귀여움</h3>
             </div>
-            <p class="text-neutral-600 dark:text-neutral-300 text-xs sm:text-base leading-relaxed flex-grow">
+            <p class="text-neutral-600 dark:text-neutral-300 text-xs sm:text-base leading-relaxed flex-grow" data-i18n data-ko="포켓몬 카드는 전 세계 저명한 아티스트들이 그린 한 폭의 작품입니다. 터치감이 느껴지는 고품질 일러스트, 반짝이는 홀로그램 기법, 그리고 포켓몬 특유의 귀엽고 역동적인 모습이 카드 한 장 한 장에 완벽하게 담겨 있어, 소장하는 것만으로도 가슴 벅찬 만족감을 선사합니다." data-en="Pokémon cards are works of art painted by world-renowned artists. High-quality illustrations, shimmering holograms, and the adorable, energetic charm of Pokémon are all captured in every card, offering a deeply satisfying collecting experience.">
               포켓몬 카드는 전 세계 저명한 아티스트들이 그린 한 폭의 작품입니다. 터치감이 느껴지는 고품질 일러스트, 반짝이는 홀로그램 기법, 그리고 포켓몬 특유의 귀엽고 역동적인 모습이 카드 한 장 한 장에 완벽하게 담겨 있어, 소장하는 것만으로도 가슴 벅찬 만족감을 선사합니다.
             </p>
             <div class="mt-6 pt-4 border-t border-neutral-100 dark:border-neutral-700 flex items-center justify-between text-[11px] sm:text-sm text-neutral-500 dark:text-neutral-400">
@@ -510,9 +518,9 @@
           <div class="p-6 sm:p-8 flex-grow flex flex-col">
             <div class="flex items-center gap-2 sm:gap-3 mb-4">
               <div class="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 dark:bg-red-950/60 text-poke-red rounded-full flex items-center justify-center font-bold text-sm sm:text-base">02</div>
-              <h3 class="text-lg sm:text-2xl font-bold text-poke-dark dark:text-white">소통을 이어주는 세대 초월 게임</h3>
+              <h3 class="text-lg sm:text-2xl font-bold text-poke-dark dark:text-white" data-i18n data-ko="소통을 이어주는 세대 초월 게임" data-en="A cross-generational game that brings people together">소통을 이어주는 세대 초월 게임</h3>
             </div>
-            <p class="text-neutral-600 dark:text-neutral-300 text-xs sm:text-base leading-relaxed flex-grow">
+            <p class="text-neutral-600 dark:text-neutral-300 text-xs sm:text-base leading-relaxed flex-grow" data-i18n data-ko="포켓몬 카드는 세대 간의 벽을 허무는 특별한 매개체입니다. 90년대 포켓몬스터 애니메이션을 보고 자란 부모가 지금 포켓몬을 좋아하는 자녀와 같은 룰로 게임을 하며 자연스럽게 소통하고 교감할 수 있습니다. 지혜로운 어른과 기발한 아이들의 멋진 한판 승부가 펼쳐집니다!" data-en="Pokémon cards are a unique bridge across generations. Parents who grew up with the 1990s anime can play by the same rules with children who love Pokémon today, creating natural conversations and meaningful connection. A wonderful showdown between wise adults and inventive kids unfolds.">
               포켓몬 카드는 세대 간의 벽을 허무는 특별한 매개체입니다. 90년대 포켓몬스터 애니메이션을 보고 자란 부모가 지금 포켓몬을 좋아하는 자녀와 같은 룰로 게임을 하며 자연스럽게 소통하고 교감할 수 있습니다. 지혜로운 어른과 기발한 아이들의 멋진 한판 승부가 펼쳐집니다!
             </p>
             <div class="mt-6 pt-4 border-t border-neutral-100 dark:border-neutral-700 flex items-center justify-between text-[11px] sm:text-sm text-neutral-500 dark:text-neutral-400">
@@ -536,12 +544,12 @@
       <div class="text-center max-w-3xl mx-auto mb-8 md:mb-16">
         <span class="text-poke-red font-bold uppercase tracking-widest text-xs sm:text-sm">Line-Up Series</span>
         <h2 class="font-title text-2xl sm:text-4xl md:text-5xl text-poke-dark dark:text-white mt-2 mb-4">
-          대표 인기 카드팩 라인업
+          <span data-i18n data-ko="대표 인기 카드팩 라인업" data-en="Popular card pack lineup">대표 인기 카드팩 라인업</span>
         </h2>
         <div class="w-16 h-1 bg-poke-red mx-auto mb-6"></div>
         <p class="text-neutral-600 dark:text-neutral-300 text-xs sm:text-lg px-2 sm:px-0">
-          지금 가장 핫한 포켓몬 카드팩을 소개합니다! <br class="md:hidden"> 
-          <span class="font-bold text-poke-red md:text-neutral-600 dark:md:text-neutral-300">왼쪽/오른쪽으로 밀고(Swipe), 터치하면</span> 카드가 뒤집힙니다!
+          <span data-i18n data-ko="지금 가장 핫한 포켓몬 카드팩을 소개합니다!" data-en="Here are the hottest Pokémon card packs right now!">지금 가장 핫한 포켓몬 카드팩을 소개합니다!</span> <br class="md:hidden"> 
+          <span class="font-bold text-poke-red md:text-neutral-600 dark:md:text-neutral-300" data-i18n data-ko="왼쪽/오른쪽으로 밀고(Swipe), 터치하면" data-en="Swipe left or right and tap to flip">왼쪽/오른쪽으로 밀고(Swipe), 터치하면</span> <span data-i18n data-ko="카드가 뒤집힙니다!" data-en="the card flips!">카드가 뒤집힙니다!</span>
         </p>
       </div>
 
@@ -706,7 +714,7 @@
         <p class="text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto mb-6 text-xs sm:text-base">
           걱정하지 마세요! 포켓몬 카드 게임 공식 채널 및 매장에서 완전 기초부터 차근차근 배울 수 있는 "티칭교실"이 매주 무료로 운영되고 있습니다. 가족과 함께 오셔서 카드와 룰을 선물로 받아가세요!
         </p>
-        <a href="#footer" class="inline-flex items-center gap-2 text-poke-red font-bold hover:underline transition-all text-xs sm:text-base">
+        <a href="https://pokemoncard.co.kr/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-poke-red font-bold hover:underline transition-all text-xs sm:text-base">
           가까운 공인 카드숍 및 티칭 이벤트 확인하기 <i class="fa-solid fa-arrow-right"></i>
         </a>
       </div>
@@ -722,12 +730,12 @@
       <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16">
         <span class="text-poke-red font-bold uppercase tracking-widest text-xs sm:text-sm">Card Showcase Board</span>
         <h2 class="font-title text-2xl sm:text-4xl md:text-5xl text-poke-dark dark:text-white mt-2 mb-4 leading-snug">
-          내 카드 제보 & <span class="text-poke-red">배틀 티어 자랑방</span>
+          <span data-i18n data-ko="내 카드 제보 &" data-en="Share your cards &">내 카드 제보 &</span> <span class="text-poke-red" data-i18n data-ko="배틀 티어 자랑방" data-en="show off your battle tier">배틀 티어 자랑방</span>
         </h2>
         <div class="w-16 h-1 bg-poke-red mx-auto mb-6"></div>
         <p class="text-neutral-600 dark:text-neutral-300 text-xs sm:text-lg px-2 sm:px-0">
-          내가 가진 카드의 실물을 찍어 올리고 다른 트레이너들에게 공유해 보세요! <br class="hidden sm:inline">
-          현재 메타에서의 배틀 티어 평가와 레어도를 입력하면 실시간 전당에 즉시 기록됩니다.
+          <span data-i18n data-ko="내가 가진 카드의 실물을 찍어 올리고 다른 트레이너들에게 공유해 보세요!" data-en="Take a photo of your cards and share them with other trainers!">내가 가진 카드의 실물을 찍어 올리고 다른 트레이너들에게 공유해 보세요!</span> <br class="hidden sm:inline">
+          <span data-i18n data-ko="현재 메타에서의 배틀 티어 평가와 레어도를 입력하면 실시간 전당에 즉시 기록됩니다." data-en="Enter your battle tier and rarity to have your cards instantly featured on the live leaderboard.">현재 메타에서의 배틀 티어 평가와 레어도를 입력하면 실시간 전당에 즉시 기록됩니다.</span>
         </p>
       </div>
 
@@ -965,17 +973,17 @@
           <h4 class="font-bold text-sm text-neutral-200 uppercase tracking-wider mb-4">공식 채널 바로가기</h4>
           <ul class="space-y-2.5 text-sm text-neutral-400">
             <li>
-              <a href="#" class="hover:text-poke-red transition-colors flex items-center gap-2 py-1">
+              <a href="https://pokemonkorea.co.kr/" target="_blank" rel="noopener noreferrer" class="hover:text-poke-red transition-colors flex items-center gap-2 py-1">
                 <i class="fa-solid fa-globe w-4 text-poke-red"></i> 포켓몬 코리아 공식 사이트
               </a>
             </li>
             <li>
-              <a href="#" class="hover:text-poke-red transition-colors flex items-center gap-2 py-1">
+              <a href="https://www.pokemonstore.co.kr/" target="_blank" rel="noopener noreferrer" class="hover:text-poke-red transition-colors flex items-center gap-2 py-1">
                 <i class="fa-solid fa-store w-4 text-poke-red"></i> 포켓몬 온라인 스토어
               </a>
             </li>
             <li>
-              <a href="#" class="hover:text-poke-red transition-colors flex items-center gap-2 py-1">
+              <a href="https://www.youtube.com/@PokemonKoreaInc" target="_blank" rel="noopener noreferrer" class="hover:text-poke-red transition-colors flex items-center gap-2 py-1">
                 <i class="fa-brands fa-youtube w-4 text-poke-red"></i> 공식 유튜브 채널
               </a>
             </li>
@@ -1236,6 +1244,36 @@
         element.classList.add('text-poke-red', 'dark:text-poke-red');
       }
     }
+
+    // Language Toggle Logic
+    const langToggleBtn = document.getElementById('lang-toggle');
+    const langToggleLabel = document.getElementById('lang-toggle-label');
+    let currentLang = localStorage.getItem('preferred-language') || 'ko';
+
+    function applyLanguage() {
+      document.documentElement.lang = currentLang === 'ko' ? 'ko' : 'en';
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const value = currentLang === 'ko' ? el.getAttribute('data-ko') : el.getAttribute('data-en');
+        if (value !== null) {
+          el.textContent = value;
+        }
+      });
+
+      if (langToggleBtn) {
+        langToggleBtn.setAttribute('aria-label', currentLang === 'ko' ? 'Switch language' : '언어 전환');
+      }
+      if (langToggleLabel) {
+        langToggleLabel.textContent = currentLang === 'ko' ? 'EN' : '한';
+      }
+    }
+
+    langToggleBtn?.addEventListener('click', () => {
+      currentLang = currentLang === 'ko' ? 'en' : 'ko';
+      localStorage.setItem('preferred-language', currentLang);
+      applyLanguage();
+    });
+
+    applyLanguage();
 
     // Dark & Light Mode Theme Toggle Logic
     const themeToggleBtn = document.getElementById('theme-toggle');
