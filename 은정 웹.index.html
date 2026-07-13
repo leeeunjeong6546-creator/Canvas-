@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>포켓몬 카드 - 세상을 바꾸는 카드게임</title>
+  <!-- Tailwind CSS CDN (Layout & Base Styling) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind Dark Mode Class Configuration -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    }
+  </script>
+  <!-- Google Fonts (Noto Sans KR & Black Han Sans for bold headings) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* Custom Theme & Typography Styles */
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      scroll-behavior: smooth;
+      -webkit-tap-highlight-color: transparent; /* Remove touch highlight on mobile */
+    }
+    
+    .font-title {
+      font-family: 'Black Han Sans', sans-serif;
+      letter-spacing: 0.05em;
+    }
+
+    /* Pokemon Ball Theme Gradient & Colors */
+    .bg-poke-red {
+      background-color: #EE1515;
+    }
+    .text-poke-red {
+      color: #EE1515;
+    }
+    .border-poke-red {
+      border-color: #EE1515;
+    }
+    .bg-poke-dark {
+      background-color: #222224;
+    }
+
+    /* Custom Animation for Playful Pokemons */
+    @keyframes bounce-gentle {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(3deg); }
+    }
+    @keyframes float-slow {
+      0%, 100% { transform: translateY(0px) rotate(-1deg); }
+      50% { transform: translateY(-10px) rotate(1deg); }
+    }
+    @keyframes spin-pokeball {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    .animate-bounce-gentle {
+      animation: bounce-gentle 4s ease-in-out infinite;
+    }
+    .animate-float-slow {
+      animation: float-slow 6s ease-in-out infinite;
+    }
+    .animate-spin-pokeball {
+      animation: spin-pokeball 20s linear infinite;
+    }
+
+    /* Card Flip Effect (Desktop Hover + Mobile Click Toggle) */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .card-inner {
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+    
+    /* Support both desktop hover and dynamic toggle for touch screens */
+    .card-hover:hover .card-inner,
+    .card-hover.is-flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+    
+    .card-front, .card-back {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden; /* Safari Support */
+    }
+    .card-back {
+      transform: rotateY(180deg);
+    }
+
+    /* Premium Hologram Effect for active cards */
+    .holo-effect {
+      position: relative;
+      overflow: hidden;
+    }
+    .holo-effect::after {
+      content: '';
+      position: absolute;
+      top: -150%;
+      left: -150%;
+      width: 300%;
+      height: 300%;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0) 30%,
+        rgba(255, 255, 255, 0.3) 40%,
+        rgba(255, 255, 255, 0.4) 50%,
+        rgba(255, 255, 255, 0.3) 60%,
+        rgba(255, 255, 255, 0) 70%
+      );
+      transform: rotate(-10deg);
+      transition: 0.5s;
+      pointer-events: none;
+    }
+    .holo-effect:hover::after,
+    .is-flipped .holo-effect::after {
+      left: 100%;
+      top: 100%;
+      transition: all 0.8s ease-in-out;
+    }
+
+    /* Hide horizontal scrollbar but keep functionality for mobile swipe view */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+  </style>
+  <script>
+    // Inline script to prevent theme flash (Dark/Light) before DOM renders
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+</head>
+<body class="bg-white dark:bg-neutral-950 text-neutral-800 dark:text-neutral-100 overflow-x-hidden transition-colors duration-500 pb-16 md:pb-0">
+
+  <!-- BACKGROUND PARTICLE CANVAS (Subtle Floating Embers) -->
+  <canvas id="particle-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-0"></canvas>
+
+  <!-- NAVIGATION HEADER -->
+  <header class="fixed top-0 left-0 w-full bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md z-50 border-b-4 border-poke-red shadow-md transition-colors duration-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-2 group">
+        <div class="relative w-10 h-10 bg-white rounded-full border-4 border-black flex items-center justify-center overflow-hidden shadow-inner">
+          <div class="absolute top-0 left-0 w-full h-1/2 bg-poke-red"></div>
+          <div class="absolute top-[14px] left-0 w-full h-2 bg-black"></div>
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full border-4 border-black z-10"></div>
+        </div>
+        <span class="font-title text-xl sm:text-2xl tracking-wider text-poke-dark dark:text-white group-hover:text-poke-red transition-colors duration-300">
+          POKÉMON <span class="text-poke-red">CARD</span>
+        </span>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center gap-8 font-medium text-neutral-700 dark:text-neutral-300">
+        <a href="#playground" class="hover:text-poke-red dark:hover:text-poke-red transition-colors">포켓몬 놀이터</a>
+        <a href="#intro" class="hover:text-poke-red dark:hover:text-poke-red transition-colors">배틀 소개</a>
+        <a href="#attraction" class="hover:text-poke-red dark:hover:text-poke-red transition-colors">핵심 매력</a>
+        <a href="#packs" class="hover:text-poke-red dark:hover:text-poke-red transition-colors">카드팩 라인업</a>
+        <a href="#share-board" class="hover:text-poke-red dark:hover:text-poke-red transition-colors">카드 제보방</a>
+      </nav>
+
+      <!-- Theme Toggle & CTA Buttons Group -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Theme Toggle Button -->
+        <button id="theme-toggle" class="p-3 rounded-full text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-300 focus:outline-none" aria-label="테마 전환">
+          <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+        </button>
+
+        <!-- CTA Button (Desktop) -->
+        <div class="hidden sm:block">
+          <a href="#packs" class="bg-poke-red text-white font-bold px-5 py-2.5 rounded-full shadow-lg hover:bg-red-700 transition-all transform hover:scale-105 inline-flex items-center gap-2 text-sm">
+            <i class="fa-solid fa-gamepad"></i> 카드 배틀 시작하기
+          </a>
+        </div>
+
+        <!-- Mobile Menu Button (Toggle side panel / info) -->
+        <button id="menu-btn" class="md:hidden text-2xl text-poke-dark dark:text-white focus:outline-none p-3 -mr-3" aria-label="메뉴 열기">
+          <i class="fa-solid fa-bars" id="menu-icon"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu (Floating Dropdown Overlay) -->
+    <div id="mobile-menu" class="hidden absolute top-20 left-0 w-full bg-white dark:bg-neutral-900 border-b-2 border-neutral-100 dark:border-neutral-800 px-6 py-5 space-y-4 shadow-xl z-40 transition-colors duration-500">
+      <a href="#playground" class="block font-medium py-2.5 text-lg border-b border-neutral-50 dark:border-neutral-800 hover:text-poke-red dark:text-neutral-200" onclick="toggleMenu()">포켓몬 놀이터</a>
+      <a href="#intro" class="block font-medium py-2.5 text-lg border-b border-neutral-50 dark:border-neutral-800 hover:text-poke-red dark:text-neutral-200" onclick="toggleMenu()">배틀 소개</a>
+      <a href="#attraction" class="block font-medium py-2.5 text-lg border-b border-neutral-50 dark:border-neutral-800 hover:text-poke-red dark:text-neutral-200" onclick="toggleMenu()">핵심 매력</a>
+      <a href="#packs" class="block font-medium py-2.5 text-lg border-b border-neutral-50 dark:border-neutral-800 hover:text-poke-red dark:text-neutral-200" onclick="toggleMenu()">카드팩 라인업</a>
+      <a href="#share-board" class="block font-medium py-2.5 text-lg border-b border-neutral-50 dark:border-neutral-800 hover:text-poke-red dark:text-neutral-200" onclick="toggleMenu()">카드 제보방</a>
+      <a href="#packs" class="block bg-poke-red text-white text-center font-bold py-3.5 rounded-full shadow-md text-base" onclick="toggleMenu()">카드 배틀 시작하기</a>
+    </div>
+  </header>
+
+  <!-- HERO SECTION / SECTION 1: 포켓몬들이 신나게 노는 공간 -->
+  <section id="playground" class="relative pt-24 pb-16 md:py-36 bg-gradient-to-b from-red-50/70 to-white/90 dark:from-red-950/20 dark:to-neutral-950/90 overflow-hidden min-h-screen flex items-center transition-colors duration-500 z-10">
+    <!-- Decorative PokeBall Background -->
+    <div class="absolute -right-20 -bottom-20 w-96 h-96 md:w-[600px] md:h-[600px] opacity-5 dark:opacity-10 pointer-events-none transition-opacity">
+      <svg class="animate-spin-pokeball w-full h-full text-poke-dark dark:text-white" viewBox="0 0 100 100" fill="currentColor">
+        <circle cx="50" cy="50" r="48" stroke="currentColor" stroke-width="4" fill="none"/>
+        <line x1="2" y1="50" x2="98" y2="50" stroke="currentColor" stroke-width="4"/>
+        <circle cx="50" cy="50" r="15" fill="none" stroke="currentColor" stroke-width="4"/>
+      </svg>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <!-- Text Content -->
+        <div class="lg:col-span-7 text-center lg:text-left mt-6 lg:mt-0">
+          <div class="inline-flex items-center gap-2 bg-white dark:bg-neutral-800 px-4 py-1.5 rounded-full shadow-sm border border-neutral-100 dark:border-neutral-700 text-poke-red font-bold text-xs md:text-sm mb-6 animate-bounce transition-colors">
+            <span class="flex h-2 w-2 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-poke-red opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-poke-red"></span>
+            </span>
+            어른과 아이가 함께 만드는 새로운 세상
+          </div>
+          
+          <h1 class="font-title text-3xl sm:text-5xl md:text-6xl text-poke-dark dark:text-white leading-tight mb-6">
+            어린이와 어른 둘다<br class="hidden sm:inline"> 즐기는 카드게임이<br>
+            <span class="text-poke-red relative inline-block">
+              세상을 바꾼다!
+              <span class="absolute left-0 bottom-1 w-full h-2 bg-red-200 dark:bg-red-950 -z-10"></span>
+            </span>
+          </h1>
+          
+          <p class="text-neutral-600 dark:text-neutral-300 text-sm sm:text-base md:text-xl font-normal leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
+            애니메이션의 추억을 간직한 <span class="font-bold text-neutral-800 dark:text-white">어른</span>부터, <br class="sm:hidden">
+            포켓몬 세계에 빠져든 <span class="font-bold text-neutral-800 dark:text-white">어린이</span>까지! <br>
+            함께 교감하고, 두뇌를 펼치는 세대 초월의 배틀을 지금 시작하세요.
+          </p>
+          
+          <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 px-4 sm:px-0">
+            <a href="#intro" class="bg-poke-red text-white font-bold text-base px-8 py-4 rounded-full shadow-lg hover:bg-red-700 transition-all transform hover:-translate-y-1 text-center">
+              포켓몬 카드 월드 탐험하기
+            </a>
+            <a href="#attraction" class="bg-white dark:bg-neutral-800 text-poke-dark dark:text-white border-2 border-neutral-200 dark:border-neutral-700 font-bold text-base px-8 py-4 rounded-full shadow-sm hover:border-poke-red hover:text-poke-red transition-all transform hover:-translate-y-1 text-center">
+              핵심 매력 알아보기
+            </a>
+          </div>
+        </div>
+
+        <!-- Visual Content (Responsive Scale to avoid overlaps on small screens) -->
+        <div class="lg:col-span-5 relative flex justify-center items-center h-[340px] sm:h-[450px] w-full max-w-md mx-auto transform scale-90 sm:scale-100">
+          <!-- Interactive Playground Frame -->
+          <div class="absolute w-64 h-64 sm:w-96 sm:h-96 rounded-full bg-red-100/50 dark:bg-red-950/20 -z-10 animate-pulse"></div>
+          
+          <!-- Cute Pokemon Visual 1: Pikachu Sparkle -->
+          <div class="absolute top-4 left-2 sm:left-6 bg-white/95 dark:bg-neutral-800/95 p-2.5 rounded-2xl shadow-xl animate-bounce-gentle border border-neutral-100 dark:border-neutral-700 flex flex-col items-center w-28 sm:w-36 transition-all duration-500 hover:scale-105">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-yellow-100/75 dark:bg-yellow-950/40 rounded-xl mb-1.5 flex items-center justify-center p-1">
+              <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" 
+                   alt="피카츄 일러스트" 
+                   class="w-full h-full object-contain filter drop-shadow-md"
+                   onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png';">
+            </div>
+            <span class="text-[9px] sm:text-[10px] font-bold text-yellow-600 dark:text-yellow-400">전기 타입</span>
+            <span class="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200">피카츄</span>
+          </div>
+
+          <!-- Cute Pokemon Visual 2: Charmander Flame -->
+          <div class="absolute bottom-6 right-2 sm:right-6 bg-white/95 dark:bg-neutral-800/95 p-2.5 rounded-2xl shadow-xl animate-float-slow border border-neutral-100 dark:border-neutral-700 flex flex-col items-center w-28 sm:w-36 transition-all duration-500 hover:scale-105">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-orange-100/75 dark:bg-orange-950/40 rounded-xl mb-1.5 flex items-center justify-center p-1">
+              <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png" 
+                   alt="파이리 일러스트" 
+                   class="w-full h-full object-contain filter drop-shadow-md"
+                   onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png';">
+            </div>
+            <span class="text-[9px] sm:text-[10px] font-bold text-orange-600 dark:text-orange-400">불꽃 타입</span>
+            <span class="text-xs sm:text-sm font-bold text-neutral-800 dark:text-neutral-200">파이리</span>
+          </div>
+
+          <!-- Cute Pokemon Visual 3: Squirtle Water -->
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/95 dark:bg-neutral-800/95 p-4 sm:p-5 rounded-3xl shadow-2xl border-2 border-poke-red flex flex-col items-center w-40 sm:w-48 z-10 transition-all duration-500 hover:scale-105">
+            <span class="absolute top-3 right-3 text-poke-red animate-ping"><i class="fa-solid fa-heart text-xs"></i></span>
+            <div class="w-20 h-20 sm:w-24 sm:h-24 bg-blue-100/75 dark:bg-blue-950/40 rounded-2xl mb-2.5 flex items-center justify-center p-2">
+              <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/7.png" 
+                   alt="꼬부기 일러스트" 
+                   class="w-full h-full object-contain filter drop-shadow-md"
+                   onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png';">
+            </div>
+            <span class="text-[9px] sm:text-[10px] font-bold text-blue-600 dark:text-blue-400 mb-0.5">물 타입 #0007</span>
+            <span class="text-sm sm:text-lg font-title text-neutral-800 dark:text-neutral-200">꼬부기</span>
+            <span class="text-[10px] sm:text-[11px] text-neutral-400 dark:text-neutral-400 mt-0.5">"사랑스러운 귀염둥이!"</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Section Divider (Wave) -->
+    <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none transform rotate-180">
+      <svg class="relative block w-full h-12 text-white dark:text-neutral-950 transition-colors duration-500" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V120H0C51.65,103,119.51,95,179.66,85.62,238.45,76.47,262.11,64,321.39,56.44Z" fill="currentColor"></path>
+      </svg>
+    </div>
+  </section>
+
+
+  <!-- SECTION 2: 소개 (귀여운 포켓몬 카드로 배틀하기) -->
+  <section id="intro" class="py-16 md:py-32 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-sm transition-colors duration-500 z-10 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Section Title -->
+      <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16">
+        <h2 class="font-title text-2xl sm:text-4xl md:text-5xl text-poke-dark dark:text-white mb-4 leading-snug">
+          귀여운 카드 속 숨겨진 <span class="text-poke-red">엄청난 전략!</span>
+        </h2>
+        <div class="w-16 h-1 bg-poke-red mx-auto mb-6"></div>
+        <p class="text-neutral-600 dark:text-neutral-300 text-sm sm:text-lg px-2 sm:px-0">
+          포켓몬 카드는 단순히 수집하는 즐거움을 넘어, 자신만의 덱을 구성하고 상대를 공략하는 본격적인 트레이딩 카드 게임(TCG)입니다. 귀여운 비주얼 뒤에 숨겨진 치열하고 짜릿한 배틀의 세계를 느껴보세요!
+        </p>
+      </div>
+
+      <!-- Battle Overview Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <!-- Battle Mechanics Visualization (Responsive stack support) -->
+        <div class="lg:col-span-6 bg-gradient-to-tr from-neutral-100 to-red-50/70 dark:from-neutral-900 dark:to-red-950/20 p-4 sm:p-10 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-xl relative overflow-hidden transition-all duration-505">
+          <div class="absolute -top-10 -left-10 w-40 h-40 bg-poke-red/5 rounded-full"></div>
+          
+          <!-- VS Simulation -->
+          <div class="flex flex-col gap-4 sm:gap-6 relative z-10 w-full">
+            <!-- Opponent Card -->
+            <div class="flex justify-end transform -rotate-1 sm:-rotate-2 hover:rotate-0 transition-all duration-300">
+              <div class="bg-white/95 dark:bg-neutral-800/95 border-2 border-purple-500 rounded-2xl p-3 sm:p-4 shadow-lg w-full max-w-[240px] flex items-center gap-3 transition-colors">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-purple-50 dark:bg-neutral-900 rounded-xl overflow-hidden flex items-center justify-center p-1 flex-shrink-0">
+                  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png" 
+                       alt="팬텀" 
+                       class="w-full h-full object-contain filter drop-shadow"
+                       onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png';">
+                </div>
+                <div class="min-w-0 flex-grow">
+                  <div class="font-bold text-xs sm:text-sm truncate text-neutral-800 dark:text-neutral-100">팬텀 ex</div>
+                  <div class="text-[9px] sm:text-[10px] text-purple-500 dark:text-purple-400 font-bold">HP 320 • 초타입</div>
+                  <div class="w-full h-1 bg-purple-200 dark:bg-neutral-700 rounded-full mt-1.5 overflow-hidden">
+                    <div class="bg-purple-500 h-full w-[80%]"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- VS Badge -->
+            <div class="flex justify-center my-1 sm:my-2">
+              <span class="font-title bg-poke-red text-white px-4 py-1.5 sm:px-5 sm:py-2.5 rounded-full text-base sm:text-lg shadow-md border-2 border-white dark:border-neutral-800 animate-pulse">VS</span>
+            </div>
+
+            <!-- Player Card -->
+            <div class="flex justify-start transform rotate-1 sm:rotate-3 hover:rotate-0 transition-all duration-300">
+              <div class="bg-white/95 dark:bg-neutral-800/95 border-4 border-yellow-400 rounded-2xl p-3 sm:p-4 shadow-xl w-full max-w-[240px] flex items-center gap-3 relative transition-colors">
+                <div class="absolute -top-3 right-3 bg-yellow-400 text-white text-[8px] sm:text-[10px] px-2 py-0.5 rounded-full font-bold">ACTIVE</div>
+                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-yellow-50 dark:bg-neutral-900 rounded-xl overflow-hidden flex items-center justify-center p-1 flex-shrink-0">
+                  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" 
+                       alt="피카츄" 
+                       class="w-full h-full object-contain filter drop-shadow"
+                       onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png';">
+                </div>
+                <div class="min-w-0 flex-grow">
+                  <div class="font-bold text-xs sm:text-sm truncate text-neutral-800 dark:text-neutral-100">피카츄 ex</div>
+                  <div class="text-[9px] sm:text-[10px] text-yellow-600 dark:text-yellow-400 font-bold">HP 200 • 번개타입</div>
+                  <div class="w-full h-1 bg-yellow-200 dark:bg-neutral-700 rounded-full mt-1.5 overflow-hidden">
+                    <div class="bg-yellow-400 h-full w-[95%]"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Strategy Description Text -->
+        <div class="lg:col-span-6 space-y-6 text-center lg:text-left mt-4 lg:mt-0">
+          <h3 class="text-xl sm:text-3xl font-bold text-poke-dark dark:text-white leading-snug">
+            룰은 간단하게, <br><span class="text-poke-red">플레이는 깊이 있게!</span>
+          </h3>
+          <p class="text-neutral-600 dark:text-neutral-300 text-xs sm:text-base leading-relaxed max-w-xl mx-auto lg:mx-0">
+            포켓몬 카드 게임은 각 60장의 카드로 구성된 덱을 사용하여 배틀 필드에서 상대를 제압하는 지적 스포츠입니다. 귀여운 포켓몬들을 진화시키고, 에너지를 붙여 강력한 기술을 발동하세요! 어른들에게는 뛰어난 두뇌 싸움을, 아이들에게는 수학적 사고와 문제해결력을 길러주는 검증된 에듀게임입니다.
+          </p>
+
+          <!-- Key Game Step Points (Aligned cleanly for mobile) -->
+          <div class="space-y-4 pt-2 text-left max-w-xl mx-auto lg:mx-0">
+            <div class="flex gap-3 sm:gap-4 items-start">
+              <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-100 dark:bg-red-950/60 flex items-center justify-center text-poke-red font-bold text-sm sm:text-base">1</div>
+              <div>
+                <h4 class="font-bold text-sm sm:text-base text-neutral-800 dark:text-white">나만의 포켓몬 덱 구성</h4>
+                <p class="text-neutral-500 dark:text-neutral-400 text-[11px] sm:text-sm mt-0.5">수천 장의 카드 중 나와 어울리는 포켓몬 파트너를 선택하고 전략적인 트레이너스 카드와 에너지를 조합해보세요.</p>
+              </div>
+            </div>
+            <div class="flex gap-3 sm:gap-4 items-start">
+              <div class="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-100 dark:bg-red-950/60 flex items-center justify-center text-poke-red font-bold text-sm sm:text-base">2</div>
+              <div>
+                <h4 class="font-bold text-sm sm:text-base text-neutral-800 dark:text-white">치열한 상성 및 진화 배틀</h4>
+                <p class="text-neutral-500 dark:text-neutral-400 text-[11px] sm:text-sm mt-0.5">타입 상성을 활용해 불리한 상황을 뒤집고, 기본 포켓몬을 강력한 ex 카드나 테라스탈 카드로 진화시켜 압도하세요.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- SECTION 3: 핵심 매력 포인트 카드 2개 -->
+  <section id="attraction" class="py-16 md:py-32 bg-neutral-50/90 dark:bg-neutral-900/90 backdrop-blur-sm transition-colors duration-500 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      
+      <!-- Section Title -->
+      <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16">
+        <span class="text-poke-red font-bold uppercase tracking-widest text-xs sm:text-sm">Why We Love Pokémon Card?</span>
+        <h2 class="font-title text-2xl sm:text-4xl md:text-5xl text-poke-dark dark:text-white mt-2 mb-4 leading-snug">
+          포켓몬 카드의 <span class="text-poke-red">2가지 핵심 매력</span>
+        </h2>
+        <div class="w-16 h-1 bg-poke-red mx-auto"></div>
+      </div>
+
+      <!-- Feature Cards Layout -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto">
+        
+        <!-- Feature Card 1: 귀여운 포켓몬 카드들 -->
+        <div class="group bg-white/95 dark:bg-neutral-800/95 rounded-3xl overflow-hidden shadow-xl border border-neutral-100 dark:border-neutral-700 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full">
+          <!-- Card Image Container with Real Artwork -->
+          <div class="relative h-56 sm:h-64 bg-yellow-50 dark:bg-yellow-950/20 overflow-hidden flex items-center justify-center transition-colors">
+            <!-- Abstract decorative elements -->
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-yellow-100 dark:bg-yellow-900/30 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+            <!-- Heart icon inside -->
+            <span class="absolute top-4 right-4 sm:top-6 sm:right-6 text-poke-red text-xl sm:text-2xl animate-pulse z-20"><i class="fa-solid fa-heart"></i></span>
+            
+            <!-- Cute Card Visual -->
+            <div class="relative z-10 w-36 h-48 sm:w-44 sm:h-56 bg-white dark:bg-neutral-900 rounded-2xl border-4 border-yellow-400 p-2.5 sm:p-3 shadow-md flex flex-col justify-between transform -rotate-2 group-hover:rotate-0 transition-transform duration-300">
+              <div class="flex justify-between items-center text-[8px] sm:text-[10px] font-bold text-yellow-600 dark:text-yellow-400">
+                <span>기본 포켓몬</span>
+                <span>HP 60 ⚡</span>
+              </div>
+              <div class="bg-yellow-50 dark:bg-neutral-800/80 rounded-xl h-24 sm:h-28 flex items-center justify-center p-1 overflow-hidden">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/587.png" 
+                     alt="에몽가" 
+                     class="h-full object-contain filter drop-shadow-md"
+                     onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/587.png';">
+              </div>
+              <div class="text-center">
+                <div class="font-title text-xs sm:text-sm text-neutral-800 dark:text-neutral-100">에몽가</div>
+                <div class="text-[8px] sm:text-[9px] text-neutral-400">하늘을 나는 귀여운 하늘다람쥐</div>
+              </div>
+              <div class="border-t border-yellow-200 dark:border-neutral-700 pt-1 text-center text-[8px] sm:text-[9px] text-yellow-600 dark:text-yellow-400 font-semibold">
+                볼부비부비 10
+              </div>
+            </div>
+          </div>
+          
+          <!-- Card Body -->
+          <div class="p-6 sm:p-8 flex-grow flex flex-col">
+            <div class="flex items-center gap-2 sm:gap-3 mb-4">
+              <div class="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 dark:bg-red-950/60 text-poke-red rounded-full flex items-center justify-center font-bold text-sm sm:text-base">01</div>
+              <h3 class="text-lg sm:text-2xl font-bold text-poke-dark dark:text-white">소장 욕구를 부르는 귀여움</h3>
+            </div>
+            <p class="text-neutral-600 dark:text-neutral-300 text-xs sm:text-base leading-relaxed flex-grow">
+              포켓몬 카드는 전 세계 저명한 아티스트들이 그린 한 폭의 작품입니다. 터치감이 느껴지는 고품질 일러스트, 반짝이는 홀로그램 기법, 그리고 포켓몬 특유의 귀엽고 역동적인 모습이 카드 한 장 한 장에 완벽하게 담겨 있어, 소장하는 것만으로도 가슴 벅찬 만족감을 선사합니다.
+            </p>
+            <div class="mt-6 pt-4 border-t border-neutral-100 dark:border-neutral-700 flex items-center justify-between text-[11px] sm:text-sm text-neutral-500 dark:text-neutral-400">
+              <span>#귀여운일러스트</span>
+              <span>#소장가치100%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature Card 2: 어린와 어른 둘다 즐기는 게임 -->
+        <div class="group bg-white/95 dark:bg-neutral-800/95 rounded-3xl overflow-hidden shadow-xl border border-neutral-100 dark:border-neutral-700 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full">
+          <!-- Card Image Container -->
+          <div class="relative h-56 sm:h-64 bg-red-50 dark:bg-red-950/20 overflow-hidden flex items-center justify-center transition-colors">
+            <!-- Abstract decorative elements -->
+            <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-red-100 dark:bg-red-900/30 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+            <!-- Star icon inside -->
+            <span class="absolute top-4 right-4 sm:top-6 sm:right-6 text-yellow-500 text-xl sm:text-2xl z-20"><i class="fa-solid fa-star animate-bounce"></i></span>
+            
+            <!-- Dual Silhouette Representation -->
+            <div class="flex gap-3 sm:gap-4 relative z-10 scale-90 sm:scale-100">
+              <!-- Adult representation -->
+              <div class="flex flex-col items-center bg-white dark:bg-neutral-900 p-2.5 sm:p-3 rounded-2xl shadow-md w-20 sm:w-24 transform -rotate-4 group-hover:rotate-0 transition-all duration-300">
+                <span class="text-2xl sm:text-3xl mb-1">🧑‍💻</span>
+                <span class="text-[9px] sm:text-xs font-bold text-neutral-800 dark:text-neutral-200">어른 (추억)</span>
+                <div class="w-8 h-8 sm:w-10 sm:h-10 mt-1">
+                  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png" 
+                       alt="망나뇽" 
+                       class="w-full h-full object-contain"
+                       onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png';">
+                </div>
+              </div>
+              <!-- Child representation -->
+              <div class="flex flex-col items-center bg-white dark:bg-neutral-900 p-2.5 sm:p-3 rounded-2xl shadow-md w-20 sm:w-24 transform rotate-4 group-hover:rotate-0 transition-all duration-300">
+                <span class="text-2xl sm:text-3xl mb-1">👦</span>
+                <span class="text-[9px] sm:text-xs font-bold text-neutral-800 dark:text-neutral-200">아이 (현재)</span>
+                <div class="w-8 h-8 sm:w-10 sm:h-10 mt-1">
+                  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png" 
+                       alt="이상해씨" 
+                       class="w-full h-full object-contain"
+                       onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png';">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Card Body -->
+          <div class="p-6 sm:p-8 flex-grow flex flex-col">
+            <div class="flex items-center gap-2 sm:gap-3 mb-4">
+              <div class="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 dark:bg-red-950/60 text-poke-red rounded-full flex items-center justify-center font-bold text-sm sm:text-base">02</div>
+              <h3 class="text-lg sm:text-2xl font-bold text-poke-dark dark:text-white">소통을 이어주는 세대 초월 게임</h3>
+            </div>
+            <p class="text-neutral-600 dark:text-neutral-300 text-xs sm:text-base leading-relaxed flex-grow">
+              포켓몬 카드는 세대 간의 벽을 허무는 특별한 매개체입니다. 90년대 포켓몬스터 애니메이션을 보고 자란 부모가 지금 포켓몬을 좋아하는 자녀와 같은 룰로 게임을 하며 자연스럽게 소통하고 교감할 수 있습니다. 지혜로운 어른과 기발한 아이들의 멋진 한판 승부가 펼쳐집니다!
+            </p>
+            <div class="mt-6 pt-4 border-t border-neutral-100 dark:border-neutral-700 flex items-center justify-between text-[11px] sm:text-sm text-neutral-500 dark:text-neutral-400">
+              <span>#세대공감</span>
+              <span>#온가족보드게임</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- SECTION 4: 카드팩 시리즈 카드로 배치 (가로 터치 스와이프 기능 포함) -->
+  <section id="packs" class="py-16 md:py-32 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-sm transition-colors duration-500 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Section Title -->
+      <div class="text-center max-w-3xl mx-auto mb-8 md:mb-16">
+        <span class="text-poke-red font-bold uppercase tracking-widest text-xs sm:text-sm">Line-Up Series</span>
+        <h2 class="font-title text-2xl sm:text-4xl md:text-5xl text-poke-dark dark:text-white mt-2 mb-4">
+          대표 인기 카드팩 라인업
+        </h2>
+        <div class="w-16 h-1 bg-poke-red mx-auto mb-6"></div>
+        <p class="text-neutral-600 dark:text-neutral-300 text-xs sm:text-lg px-2 sm:px-0">
+          지금 가장 핫한 포켓몬 카드팩을 소개합니다! <br class="md:hidden"> 
+          <span class="font-bold text-poke-red md:text-neutral-600 dark:md:text-neutral-300">왼쪽/오른쪽으로 밀고(Swipe), 터치하면</span> 카드가 뒤집힙니다!
+        </p>
+      </div>
+
+      <!-- Card Packs Container: Mobile Horizontal Scroll, Desktop Grid Layout -->
+      <div class="flex md:grid md:grid-cols-3 gap-6 overflow-x-auto md:overflow-x-visible px-4 md:px-0 py-6 snap-x snap-mandatory no-scrollbar scroll-smooth">
+        
+        <!-- Pack Card 1 -->
+        <div class="perspective-1000 card-hover h-[450px] w-[82vw] sm:w-[400px] md:w-auto flex-shrink-0 snap-center cursor-pointer">
+          <div class="relative w-full h-full card-inner duration-500">
+            <!-- Front of the Card Pack -->
+            <div class="absolute w-full h-full card-front bg-gradient-to-b from-red-600 to-red-800 rounded-3xl p-6 shadow-xl flex flex-col justify-between border-4 border-poke-red text-white">
+              <div class="flex justify-between items-start">
+                <span class="text-xs bg-yellow-400 text-poke-dark font-bold px-3 py-1 rounded-full uppercase tracking-wider">NEW PACK</span>
+                <span class="text-xl">⭐</span>
+              </div>
+              <div class="text-center flex flex-col items-center">
+                <!-- SVG Booster Pack Graphic with Water Artwork -->
+                <div class="w-28 h-36 sm:w-32 sm:h-44 bg-red-500/80 rounded-xl border-2 border-white/30 flex items-center justify-center p-2 shadow-inner mb-4 relative overflow-hidden">
+                  <div class="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent"></div>
+                  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1009.png" 
+                       alt="굽이치는물결 패키지" 
+                       class="w-full h-full object-contain filter drop-shadow-lg"
+                       onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1009.png';">
+                </div>
+                <h3 class="font-title text-xl sm:text-2xl tracking-wide">와일드포스</h3>
+                <p class="text-[11px] sm:text-xs text-red-200 mt-1">고대 포켓몬들의 위대한 각성!</p>
+              </div>
+              <div class="text-center bg-red-900/40 py-2.5 rounded-2xl border border-red-500/30 text-xs font-bold text-red-100">
+                터치하여 카드 뒷면 확인 ➔
+              </div>
+            </div>
+            
+            <!-- Back of the Card Pack (The Secret Rare Card inside) -->
+            <div class="absolute w-full h-full card-back bg-neutral-900 rounded-3xl p-6 shadow-xl flex flex-col justify-between border-4 border-yellow-400 text-white overflow-hidden holo-effect">
+              <div class="absolute inset-0 bg-gradient-to-tr from-yellow-500/10 to-transparent"></div>
+              <div class="flex justify-between items-center text-xs text-yellow-400 font-bold relative z-10">
+                <span>SUPER RARE (SR)</span>
+                <span>HP 230 ⚔️</span>
+              </div>
+              <div class="flex-grow flex flex-col items-center justify-center py-4 relative z-10">
+                <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-yellow-300 to-amber-500 flex items-center justify-center p-2 shadow-2xl mb-4 animate-bounce-gentle">
+                  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1009.png" 
+                       alt="굽이치는물결 카드" 
+                       class="w-full h-full object-contain filter drop-shadow-2xl"
+                       onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1009.png';">
+                </div>
+                <h4 class="font-title text-lg sm:text-xl text-yellow-400">굽이치는물결 ex</h4>
+                <p class="text-[10px] sm:text-[11px] text-neutral-400 mt-1 text-center">"고대의 활력이 가득 차오른 화수분!"</p>
+              </div>
+              <div class="bg-yellow-400 text-neutral-900 text-center py-2 rounded-xl text-xs font-bold relative z-10">
+                수집 난이도: ★★★★★
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pack Card 2 -->
+        <div class="perspective-1000 card-hover h-[450px] w-[82vw] sm:w-[400px] md:w-auto flex-shrink-0 snap-center cursor-pointer">
+          <div class="relative w-full h-full card-inner duration-500">
+            <!-- Front of the Card Pack -->
+            <div class="absolute w-full h-full card-front bg-gradient-to-b from-blue-600 to-blue-800 rounded-3xl p-6 shadow-xl flex flex-col justify-between border-4 border-blue-600 text-white">
+              <div class="flex justify-between items-start">
+                <span class="text-xs bg-yellow-400 text-poke-dark font-bold px-3 py-1 rounded-full uppercase tracking-wider">HOT PACK</span>
+                <span class="text-xl">🌟</span>
+              </div>
+              <div class="text-center flex flex-col items-center">
+                <!-- SVG Booster Pack Graphic with Future Artwork -->
+                <div class="w-28 h-36 sm:w-32 sm:h-44 bg-blue-500/80 rounded-xl border-2 border-white/30 flex items-center justify-center p-2 shadow-inner mb-4 relative overflow-hidden">
+                  <div class="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent"></div>
+                  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1010.png" 
+                       alt="무쇠잎새 패키지" 
+                       class="w-full h-full object-contain filter drop-shadow-lg"
+                       onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1010.png';">
+                </div>
+                <h3 class="font-title text-xl sm:text-2xl tracking-wide">사이버저지</h3>
+                <p class="text-[11px] sm:text-xs text-blue-200 mt-1">미래에서 날아온 메카닉 배틀!</p>
+              </div>
+              <div class="text-center bg-blue-900/40 py-2.5 rounded-2xl border border-blue-500/30 text-xs font-bold text-blue-100">
+                터치하여 카드 뒷면 확인 ➔
+              </div>
+            </div>
+            
+            <!-- Back of the Card Pack (The Secret Rare Card inside) -->
+            <div class="absolute w-full h-full card-back bg-neutral-900 rounded-3xl p-6 shadow-xl flex flex-col justify-between border-4 border-cyan-400 text-white overflow-hidden holo-effect">
+              <div class="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 to-transparent"></div>
+              <div class="flex justify-between items-center text-xs text-cyan-400 font-bold relative z-10">
+                <span>ULTRA RARE (UR)</span>
+                <span>HP 220 🔋</span>
+              </div>
+              <div class="flex-grow flex flex-col items-center justify-center py-4 relative z-10">
+                <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center p-2 shadow-2xl mb-4 animate-float-slow">
+                  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1010.png" 
+                       alt="무쇠잎새 카드" 
+                       class="w-full h-full object-contain filter drop-shadow-2xl"
+                       onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1010.png';">
+                </div>
+                <h4 class="font-title text-lg sm:text-xl text-cyan-400">무쇠잎새 ex</h4>
+                <p class="text-[10px] sm:text-[11px] text-neutral-400 mt-1 text-center">"최첨단 과학 기술로 업그레이드된 칼날"</p>
+              </div>
+              <div class="bg-cyan-400 text-neutral-900 text-center py-2 rounded-xl text-xs font-bold relative z-10">
+                수집 난이도: ★★★★★
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pack Card 3 -->
+        <div class="perspective-1000 card-hover h-[450px] w-[82vw] sm:w-[400px] md:w-auto flex-shrink-0 snap-center cursor-pointer">
+          <div class="relative w-full h-full card-inner duration-500">
+            <!-- Front of the Card Pack -->
+            <div class="absolute w-full h-full card-front bg-gradient-to-b from-amber-600 to-amber-800 rounded-3xl p-6 shadow-xl flex flex-col justify-between border-4 border-amber-600 text-white">
+              <div class="flex justify-between items-start">
+                <span class="text-xs bg-yellow-400 text-poke-dark font-bold px-3 py-1 rounded-full uppercase tracking-wider">POPULAR</span>
+                <span class="text-xl">✨</span>
+              </div>
+              <div class="text-center flex flex-col items-center">
+                <!-- SVG Booster Pack Graphic with Clay Artwork -->
+                <div class="w-28 h-36 sm:w-32 sm:h-44 bg-amber-500/80 rounded-xl border-2 border-white/30 flex items-center justify-center p-2 shadow-inner mb-4 relative overflow-hidden">
+                  <div class="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent"></div>
+                  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1004.png" 
+                       alt="딩루 패키지" 
+                       class="w-full h-full object-contain filter drop-shadow-lg"
+                       onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1004.png';">
+                </div>
+                <h3 class="font-title text-xl sm:text-2xl tracking-wide">클레이버스트</h3>
+                <p class="text-[11px] sm:text-xs text-amber-200 mt-1">대지를 요동치게 만드는 파워!</p>
+              </div>
+              <div class="text-center bg-amber-900/40 py-2.5 rounded-2xl border border-amber-500/30 text-xs font-bold text-amber-100">
+                터치하여 카드 뒷면 확인 ➔
+              </div>
+            </div>
+            
+            <!-- Back of the Card Pack (The Secret Rare Card inside) -->
+            <div class="absolute w-full h-full card-back bg-neutral-900 rounded-3xl p-6 shadow-xl flex flex-col justify-between border-4 border-amber-400 text-white overflow-hidden holo-effect">
+              <div class="absolute inset-0 bg-gradient-to-tr from-yellow-500/10 to-transparent"></div>
+              <div class="flex justify-between items-center text-xs text-amber-400 font-bold relative z-10">
+                <span>SECRET SPECIAL (SAR)</span>
+                <span>HP 340 💎</span>
+              </div>
+              <div class="flex-grow flex flex-col items-center justify-center py-4 relative z-10">
+                <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-amber-300 to-orange-500 flex items-center justify-center p-2 shadow-2xl mb-4 animate-bounce-gentle">
+                  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1004.png" 
+                       alt="딩루 카드" 
+                       class="w-full h-full object-contain filter drop-shadow-2xl"
+                       onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1004.png';">
+                </div>
+                <h4 class="font-title text-lg sm:text-xl text-amber-400">딩루 ex</h4>
+                <p class="text-[10px] sm:text-[11px] text-neutral-400 mt-1 text-center">"견고한 토기로 모든 충격을 흡수한다"</p>
+              </div>
+              <div class="bg-amber-400 text-neutral-900 text-center py-2 rounded-xl text-xs font-bold relative z-10">
+                수집 난이도: ★★★★★★
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quick Play Guide / Interactive Simulation Link -->
+      <div class="mt-16 bg-neutral-50/90 dark:bg-neutral-900/90 backdrop-blur-sm rounded-3xl p-6 md:p-12 text-center border border-neutral-100 dark:border-neutral-800 shadow-md transition-colors">
+        <h3 class="text-xl sm:text-2xl font-bold text-poke-dark dark:text-white mb-4">카드를 처음 만져보시나요?</h3>
+        <p class="text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto mb-6 text-xs sm:text-base">
+          걱정하지 마세요! 포켓몬 카드 게임 공식 채널 및 매장에서 완전 기초부터 차근차근 배울 수 있는 "티칭교실"이 매주 무료로 운영되고 있습니다. 가족과 함께 오셔서 카드와 룰을 선물로 받아가세요!
+        </p>
+        <a href="#footer" class="inline-flex items-center gap-2 text-poke-red font-bold hover:underline transition-all text-xs sm:text-base">
+          가까운 공인 공인카드샵 및 티칭이벤트 확인하기 <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 5: 실시간 가진 카드 제보 및 자랑 배틀 게시판 -->
+  <section id="share-board" class="py-16 md:py-32 bg-neutral-50/90 dark:bg-neutral-900/90 backdrop-blur-sm transition-colors duration-500 relative z-10 border-t border-neutral-100 dark:border-neutral-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Section Title -->
+      <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16">
+        <span class="text-poke-red font-bold uppercase tracking-widest text-xs sm:text-sm">Card Showcase Board</span>
+        <h2 class="font-title text-2xl sm:text-4xl md:text-5xl text-poke-dark dark:text-white mt-2 mb-4 leading-snug">
+          내 카드 제보 & <span class="text-poke-red">배틀 티어 자랑방</span>
+        </h2>
+        <div class="w-16 h-1 bg-poke-red mx-auto mb-6"></div>
+        <p class="text-neutral-600 dark:text-neutral-300 text-xs sm:text-lg px-2 sm:px-0">
+          내가 가진 카드의 실물을 찍어 올리고 다른 트레이너들에게 공유해 보세요! <br class="hidden sm:inline">
+          현재 메타에서의 배틀 티어 평가와 레어도를 입력하면 실시간 전당에 즉시 기록됩니다.
+        </p>
+      </div>
+
+      <!-- Main Layout: Form & Shared Cards -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        
+        <!-- Upload Form Container (Sticky for desktop view) -->
+        <div class="lg:col-span-5 bg-white/95 dark:bg-neutral-800/95 border border-neutral-200/60 dark:border-neutral-700/60 rounded-3xl p-6 sm:p-8 shadow-xl lg:sticky lg:top-24 transition-colors duration-500">
+          <h3 class="text-lg sm:text-xl font-bold text-poke-dark dark:text-white mb-6 flex items-center gap-2">
+            <i class="fa-solid fa-camera text-poke-red"></i> 실물 카드 등록하기
+          </h3>
+          
+          <form id="card-share-form" class="space-y-5">
+            <!-- Image File Upload Dropzone -->
+            <div>
+              <label class="block text-xs sm:text-sm font-bold mb-2 text-neutral-700 dark:text-neutral-300">카드 사진 촬영 또는 첨부</label>
+              
+              <!-- Input File (hidden) -->
+              <input type="file" id="card-image-input" accept="image/*" class="hidden">
+              
+              <!-- Dropzone UI -->
+              <div id="dropzone" class="border-2 border-dashed border-neutral-300 dark:border-neutral-600 rounded-2xl p-6 text-center cursor-pointer hover:border-poke-red dark:hover:border-poke-red transition-all flex flex-col items-center justify-center h-48 bg-neutral-50/50 dark:bg-neutral-900/50">
+                <i class="fa-solid fa-cloud-arrow-up text-3xl text-neutral-400 dark:text-neutral-500 mb-2"></i>
+                <span class="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-medium">카드를 직접 찍거나 이미지 가져오기</span>
+                <span class="text-[10px] text-neutral-400 dark:text-neutral-500 mt-1">파일 클릭 또는 드래그 앤 드롭</span>
+              </div>
+
+              <!-- Preview Zone (hidden initially) -->
+              <div id="preview-zone" class="relative hidden border border-neutral-200 dark:border-neutral-700 rounded-2xl overflow-hidden h-48 bg-neutral-50 dark:bg-neutral-900">
+                <img id="image-preview" class="w-full h-full object-contain p-2" src="#" alt="미리보기">
+                <button type="button" id="remove-preview-btn" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition-all shadow-md">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Card Name -->
+            <div>
+              <label for="input-card-name" class="block text-xs sm:text-sm font-bold mb-2 text-neutral-700 dark:text-neutral-300">카드 이름</label>
+              <input type="text" id="input-card-name" placeholder="예: 뮤츠 ex, 리자몽 ex 등" required
+                     class="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/60 text-neutral-800 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-poke-red/50 text-sm transition-all">
+            </div>
+
+            <!-- Selection Grid (Rarity & Tier) -->
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Rarity Select -->
+              <div>
+                <label for="select-rarity" class="block text-xs sm:text-sm font-bold mb-2 text-neutral-700 dark:text-neutral-300">레어도</label>
+                <select id="select-rarity" class="w-full px-3 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/60 text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-poke-red/50 text-xs sm:text-sm transition-all">
+                  <option value="SAR">SAR (최상급 레어)</option>
+                  <option value="UR">UR (울트라 레어)</option>
+                  <option value="SR">SR (슈퍼 레어)</option>
+                  <option value="RR">RR (더블 레어)</option>
+                  <option value="R">R (레어)</option>
+                </select>
+              </div>
+
+              <!-- Battle Tier Select -->
+              <div>
+                <label for="select-tier" class="block text-xs sm:text-sm font-bold mb-2 text-neutral-700 dark:text-neutral-300">배틀 실전 티어</label>
+                <select id="select-tier" class="w-full px-3 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/60 text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-poke-red/50 text-xs sm:text-sm transition-all">
+                  <option value="S+">S+ 티어 (환경 사기)</option>
+                  <option value="S">S 티어 (환경 주도)</option>
+                  <option value="A">A 티어 (핵심 메이저)</option>
+                  <option value="B">B 티어 (준수한 조커)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Strategy Tips -->
+            <div>
+              <label for="input-card-tip" class="block text-xs sm:text-sm font-bold mb-2 text-neutral-700 dark:text-neutral-300">배틀 사용 팁 / 코멘트</label>
+              <textarea id="input-card-tip" rows="3" placeholder="예: 무색 에너지 가속과 함께 사용하면 즉시 폭발적인 데미지를 낼 수 있어 강력합니다!" required
+                        class="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/60 text-neutral-800 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-poke-red/50 text-sm transition-all resize-none"></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="w-full bg-poke-red text-white font-bold py-3.5 rounded-xl shadow-lg hover:bg-red-700 hover:shadow-xl active:scale-95 transition-all text-sm sm:text-base flex items-center justify-center gap-2">
+              <i class="fa-solid fa-share-nodes"></i> 공유 카드 등록하기
+            </button>
+          </form>
+        </div>
+
+        <!-- Real-Time Showcase Card Grid -->
+        <div class="lg:col-span-7">
+          <h3 class="text-lg sm:text-xl font-bold text-poke-dark dark:text-white mb-6 flex items-center gap-2">
+            <i class="fa-solid fa-tower-broadcast text-poke-red"></i> 실시간 트레이너 제보 목록
+          </h3>
+          
+          <!-- Shared Cards Deck Grid -->
+          <div id="shared-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            
+            <!-- Prepopulated Card 1 -->
+            <div class="bg-white/95 dark:bg-neutral-800/95 border-2 border-amber-400 rounded-2xl p-4 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-96 relative overflow-hidden group">
+              <!-- Background Hologram Wave -->
+              <div class="absolute inset-0 bg-gradient-to-tr from-yellow-500/5 to-transparent pointer-events-none"></div>
+              <!-- Badge Container -->
+              <div class="flex justify-between items-center relative z-10">
+                <span class="bg-amber-400 text-neutral-900 text-[10px] font-extrabold px-2 py-0.5 rounded-full">SAR</span>
+                <span class="bg-red-600 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">S+ Tier</span>
+              </div>
+              <!-- Pokemon Illustration Frame -->
+              <div class="flex-grow flex items-center justify-center py-2 relative z-10">
+                <div class="w-32 h-32 rounded-2xl bg-orange-50 dark:bg-neutral-900 p-2 border-2 border-dashed border-amber-300 transition-transform group-hover:scale-105 duration-300">
+                  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png" 
+                       alt="리자몽 ex" class="w-full h-full object-contain filter drop-shadow-md"
+                       onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png';">
+                </div>
+              </div>
+              <!-- Info Block -->
+              <div class="space-y-1.5 relative z-10 border-t border-neutral-100 dark:border-neutral-700/60 pt-3">
+                <div class="font-title text-base text-neutral-800 dark:text-neutral-100 flex items-center justify-between">
+                  <span>리자몽 ex</span>
+                  <span class="text-xs text-neutral-400 font-sans">#0006</span>
+                </div>
+                <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed line-clamp-2">
+                  "현재 환경 압도적 탑티어 공격수! 특성으로 강력한 파이어 에너지를 가속하여 빠른 턴 킬이 가능합니다."
+                </p>
+                <div class="flex items-center justify-between text-[9px] text-neutral-400 dark:text-neutral-500 pt-1">
+                  <span>트레이너: Red_Trainer</span>
+                  <span>방금 전</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Prepopulated Card 2 -->
+            <div class="bg-white/95 dark:bg-neutral-800/95 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-4 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-96 relative overflow-hidden group">
+              <!-- Background Hologram Wave -->
+              <div class="absolute inset-0 bg-gradient-to-tr from-cyan-500/5 to-transparent pointer-events-none"></div>
+              <!-- Badge Container -->
+              <div class="flex justify-between items-center relative z-10">
+                <span class="bg-cyan-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full">UR</span>
+                <span class="bg-orange-500 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">S Tier</span>
+              </div>
+              <!-- Pokemon Illustration Frame -->
+              <div class="flex-grow flex items-center justify-center py-2 relative z-10">
+                <div class="w-32 h-32 rounded-2xl bg-cyan-50/50 dark:bg-neutral-900 p-2 border-2 border-dashed border-cyan-300 transition-transform group-hover:scale-105 duration-300">
+                  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/887.png" 
+                       alt="드래펄트" class="w-full h-full object-contain filter drop-shadow-md"
+                       onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/887.png';">
+                </div>
+              </div>
+              <!-- Info Block -->
+              <div class="space-y-1.5 relative z-10 border-t border-neutral-100 dark:border-neutral-700/60 pt-3">
+                <div class="font-title text-base text-neutral-800 dark:text-neutral-100 flex items-center justify-between">
+                  <span>드래펄트 ex</span>
+                  <span class="text-xs text-neutral-400 font-sans">#0887</span>
+                </div>
+                <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed line-clamp-2">
+                  "벤치 공격이 핵심인 하이브리드 어택커. 2세대 진화형이라 진화 카드가 필수적이지만 화력이 훌륭합니다."
+                </p>
+                <div class="flex items-center justify-between text-[9px] text-neutral-400 dark:text-neutral-500 pt-1">
+                  <span>트레이너: Blue_Eye</span>
+                  <span>5분 전</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Prepopulated Card 3 -->
+            <div class="bg-white/95 dark:bg-neutral-800/95 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-4 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-96 relative overflow-hidden group">
+              <!-- Background Hologram Wave -->
+              <div class="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 to-transparent pointer-events-none"></div>
+              <!-- Badge Container -->
+              <div class="flex justify-between items-center relative z-10">
+                <span class="bg-indigo-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full">SR</span>
+                <span class="bg-amber-600 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">A Tier</span>
+              </div>
+              <!-- Pokemon Illustration Frame -->
+              <div class="flex-grow flex items-center justify-center py-2 relative z-10">
+                <div class="w-32 h-32 rounded-2xl bg-indigo-50/50 dark:bg-neutral-900 p-2 border-2 border-dashed border-indigo-300 transition-transform group-hover:scale-105 duration-300">
+                  <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1002.png" 
+                       alt="파오젠" class="w-full h-full object-contain filter drop-shadow-md"
+                       onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1002.png';">
+                </div>
+              </div>
+              <!-- Info Block -->
+              <div class="space-y-1.5 relative z-10 border-t border-neutral-100 dark:border-neutral-700/60 pt-3">
+                <div class="font-title text-base text-neutral-800 dark:text-neutral-100 flex items-center justify-between">
+                  <span>파오젠 ex</span>
+                  <span class="text-xs text-neutral-400 font-sans">#1002</span>
+                </div>
+                <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed line-clamp-2">
+                  "물 에너지를 자유롭게 핸드하는 우수한 유틸리티 서포터 특성을 가졌습니다. 물타입 덱의 만능 키 카드!"
+                </p>
+                <div class="flex items-center justify-between text-[9px] text-neutral-400 dark:text-neutral-500 pt-1">
+                  <span>트레이너: Ash_Ketchum</span>
+                  <span>10분 전</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CUSTOM SUCCESS MODAL/TOAST (No-Alert Policy Guardrail) -->
+  <div id="custom-toast" class="fixed bottom-20 md:bottom-6 right-6 bg-emerald-600 text-white font-bold px-6 py-4 rounded-2xl shadow-2xl z-50 flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <div>
+      <h5 class="text-sm">성공!</h5>
+      <p class="text-xs font-normal text-emerald-100">나의 카드가 실시간 제보판에 성공적으로 전송되었습니다.</p>
+    </div>
+  </div>
+
+  <!-- FOOTER - 공식 사이트 링크 / 문의처 -->
+  <footer id="footer" class="bg-poke-dark/95 dark:bg-neutral-950/95 backdrop-blur-sm text-white pt-16 pb-8 border-t-8 border-poke-red transition-colors duration-500 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Footer Top Content -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-10 pb-12 border-b border-neutral-800 dark:border-neutral-900">
+        <!-- Brand & Catchphrase -->
+        <div class="md:col-span-6 space-y-4">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-white rounded-full border-2 border-black flex items-center justify-center overflow-hidden">
+              <div class="w-full h-1/2 bg-poke-red"></div>
+            </div>
+            <span class="font-title text-xl tracking-wider">
+              POKÉMON <span class="text-poke-red">CARD</span>
+            </span>
+          </div>
+          <p class="text-neutral-400 text-sm max-w-sm leading-relaxed">
+            "어린이와 어른 둘다 즐기는 카드게임이 세상을 바꾼다"<br>
+            포켓몬 카드는 전 세대를 하나로 묶고 교감할 수 있는 따뜻한 여가 문화를 만듭니다.
+          </p>
+        </div>
+
+        <!-- Official Links -->
+        <div class="md:col-span-3">
+          <h4 class="font-bold text-sm text-neutral-200 uppercase tracking-wider mb-4">공식 채널 바로가기</h4>
+          <ul class="space-y-2.5 text-sm text-neutral-400">
+            <li>
+              <a href="#" class="hover:text-poke-red transition-colors flex items-center gap-2 py-1">
+                <i class="fa-solid fa-globe w-4 text-poke-red"></i> 포켓몬 코리아 공식 사이트
+              </a>
+            </li>
+            <li>
+              <a href="#" class="hover:text-poke-red transition-colors flex items-center gap-2 py-1">
+                <i class="fa-solid fa-store w-4 text-poke-red"></i> 포켓몬 온라인 스토어
+              </a>
+            </li>
+            <li>
+              <a href="#" class="hover:text-poke-red transition-colors flex items-center gap-2 py-1">
+                <i class="fa-brands fa-youtube w-4 text-poke-red"></i> 공식 유튜브 채널
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Support & Inquiries -->
+        <div class="md:col-span-3">
+          <h4 class="font-bold text-sm text-neutral-200 uppercase tracking-wider mb-4">고객지원 및 문의</h4>
+          <ul class="space-y-2.5 text-sm text-neutral-400">
+            <li class="flex items-center gap-2 py-1">
+              <i class="fa-solid fa-phone w-4 text-poke-red"></i> 1588-XXXX (평일 09~18시)
+            </li>
+            <li class="flex items-center gap-2 py-1">
+              <i class="fa-solid fa-envelope w-4 text-poke-red"></i> support@pokemoncard.co.kr
+            </li>
+            <li class="flex items-center gap-2 py-1">
+              <i class="fa-solid fa-location-dot w-4 text-poke-red"></i> 서울시 강남구 테헤란로 XXX
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer Bottom Copyright & Disclaimer -->
+      <div class="pt-8 text-center md:flex md:justify-between md:items-center text-[11px] text-neutral-500 space-y-2 md:space-y-0 pb-12 md:pb-0">
+        <p>© 2026 Pokémon. © 1995-2026 Nintendo/Creatures Inc./GAME FREAK inc.</p>
+        <p>본 페이지는 포켓몬 카드 홍보를 위한 팬 메이드 콘셉트 반응형 랜딩 페이지입니다.</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- MOBILE-EXCLUSIVE BOTTOM NAVIGATION BAR (Thumb-friendly Navigation) -->
+  <div class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border-t border-neutral-100 dark:border-neutral-800 shadow-2xl flex justify-around items-center h-16 z-50 transition-colors duration-500">
+    <a href="#playground" class="flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500 hover:text-poke-red dark:hover:text-poke-red py-1 px-3" onclick="updateActiveTab(this)">
+      <i class="fa-solid fa-child-reaching text-base"></i>
+      <span class="text-[9px] mt-1 font-bold">놀이터</span>
+    </a>
+    <a href="#intro" class="flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500 hover:text-poke-red dark:hover:text-poke-red py-1 px-3" onclick="updateActiveTab(this)">
+      <i class="fa-solid fa-gamepad text-base"></i>
+      <span class="text-[9px] mt-1 font-bold">배틀 전략</span>
+    </a>
+    <!-- Dedicated Pokeball Center CTA -->
+    <a href="#packs" class="relative -top-3 flex flex-col items-center justify-center bg-poke-red text-white w-12 h-12 rounded-full shadow-lg border-4 border-white dark:border-neutral-900 transition-colors" onclick="updateActiveTab(null)">
+      <div class="relative w-full h-full flex items-center justify-center">
+        <i class="fa-solid fa-bolt text-lg"></i>
+      </div>
+    </a>
+    <a href="#share-board" class="flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500 hover:text-poke-red dark:hover:text-poke-red py-1 px-3" onclick="updateActiveTab(this)">
+      <i class="fa-solid fa-camera text-base"></i>
+      <span class="text-[9px] mt-1 font-bold">제보방</span>
+    </a>
+    <a href="#packs" class="flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-500 hover:text-poke-red dark:hover:text-poke-red py-1 px-3" onclick="updateActiveTab(this)">
+      <i class="fa-solid fa-boxes-stacked text-base"></i>
+      <span class="text-[9px] mt-1 font-bold">라인업</span>
+    </a>
+  </div>
+
+  <!-- RESPONSIVE NAV & INTERACTION SCRIPT -->
+  <script>
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIcon = document.getElementById('menu-icon');
+
+    // Toggle Mobile Navigation Menu with Icon change
+    function toggleMenu() {
+      const isHidden = mobileMenu.classList.contains('hidden');
+      if (isHidden) {
+        mobileMenu.classList.remove('hidden');
+        menuIcon.className = "fa-solid fa-xmark"; // Change menu to 'X' icon
+      } else {
+        mobileMenu.classList.add('hidden');
+        menuIcon.className = "fa-solid fa-bars";  // Change back to 'Hamburger'
+      }
+    }
+
+    menuBtn.addEventListener('click', toggleMenu);
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const isClickInsideMenu = mobileMenu.contains(event.target);
+      const isClickOnBtn = menuBtn.contains(event.target);
+      
+      if (!isClickInsideMenu && !isClickOnBtn && !mobileMenu.classList.contains('hidden')) {
+        mobileMenu.classList.add('hidden');
+        menuIcon.className = "fa-solid fa-bars";
+      }
+    });
+
+    // Touch Support for Card Flips (Toggling `.is-flipped` class)
+    const cards = document.querySelectorAll('.card-hover');
+    cards.forEach(card => {
+      card.addEventListener('click', function(e) {
+        this.classList.toggle('is-flipped');
+        cards.forEach(otherCard => {
+          if (otherCard !== card) {
+            otherCard.classList.remove('is-flipped');
+          }
+        });
+      });
+    });
+
+    // Real-Time Community Board File Upload Preview & Dynamic Prepend Script
+    const dropzone = document.getElementById('dropzone');
+    const cardImageInput = document.getElementById('card-image-input');
+    const previewZone = document.getElementById('preview-zone');
+    const imagePreview = document.getElementById('image-preview');
+    const removePreviewBtn = document.getElementById('remove-preview-btn');
+    const cardShareForm = document.getElementById('card-share-form');
+    const sharedCardsGrid = document.getElementById('shared-cards-grid');
+    const customToast = document.getElementById('custom-toast');
+    
+    let uploadedImageBase64 = null;
+
+    // Handle Dropzone click trigger file input
+    dropzone.addEventListener('click', () => cardImageInput.click());
+
+    // File Input change listener
+    cardImageInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        processUploadedFile(file);
+      }
+    });
+
+    // Drag-over support
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('border-poke-red', 'bg-red-50/10');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('border-poke-red', 'bg-red-50/10');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('border-poke-red', 'bg-red-50/10');
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        processUploadedFile(file);
+      }
+    });
+
+    function processUploadedFile(file) {
+      if (!file.type.startsWith('image/')) {
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        uploadedImageBase64 = event.target.result;
+        imagePreview.src = uploadedImageBase64;
+        dropzone.classList.add('hidden');
+        previewZone.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Remove preview photo
+    removePreviewBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      cardImageInput.value = '';
+      uploadedImageBase64 = null;
+      imagePreview.src = '#';
+      previewZone.classList.add('hidden');
+      dropzone.classList.remove('hidden');
+    });
+
+    // Handle Form Submission and dynamic insertion
+    cardShareForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const cardName = document.getElementById('input-card-name').value;
+      const rarity = document.getElementById('select-rarity').value;
+      const tier = document.getElementById('select-tier').value;
+      const tipText = document.getElementById('input-card-tip').value;
+
+      // Fallback Pokeball artwork if no image was uploaded
+      const finalImageSrc = uploadedImageBase64 || "https://placehold.co/300x400/ef4444/ffffff?text=Pokemon+Card";
+
+      // Dynamically select style border based on rarity/tier
+      let borderClass = "border border-neutral-200 dark:border-neutral-700";
+      let haloGradient = "from-indigo-50/5";
+      if (tier === "S+") {
+        borderClass = "border-2 border-amber-400";
+        haloGradient = "from-yellow-500/10";
+      } else if (tier === "S") {
+        borderClass = "border-2 border-cyan-400";
+        haloGradient = "from-cyan-500/10";
+      }
+
+      // Tier badge color mapping
+      let tierBadgeClass = "bg-amber-600";
+      if (tier === "S+") tierBadgeClass = "bg-red-600 animate-pulse";
+      if (tier === "S") tierBadgeClass = "bg-orange-500";
+      if (tier === "A") tierBadgeClass = "bg-yellow-500";
+
+      // Construct card HTML layout
+      const newCardHtml = `
+        <div class="bg-white/95 dark:bg-neutral-800/95 ${borderClass} rounded-2xl p-4 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-96 relative overflow-hidden group animate-fade-in opacity-0 translate-y-4">
+          <div class="absolute inset-0 bg-gradient-to-tr ${haloGradient} to-transparent pointer-events-none"></div>
+          <div class="flex justify-between items-center relative z-10">
+            <span class="bg-neutral-900 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full dark:bg-neutral-700">${rarity}</span>
+            <span class="${tierBadgeClass} text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">${tier} Tier</span>
+          </div>
+          <div class="flex-grow flex items-center justify-center py-2 relative z-10">
+            <div class="w-32 h-32 rounded-2xl bg-neutral-50 dark:bg-neutral-900 p-2 border border-dashed border-neutral-300/60 transition-transform group-hover:scale-105 duration-300 overflow-hidden flex items-center justify-center">
+              <img src="${finalImageSrc}" alt="${cardName}" class="w-full h-full object-contain filter drop-shadow-md">
+            </div>
+          </div>
+          <div class="space-y-1.5 relative z-10 border-t border-neutral-100 dark:border-neutral-700/60 pt-3">
+            <div class="font-title text-base text-neutral-800 dark:text-neutral-100 flex items-center justify-between">
+              <span>${cardName}</span>
+              <span class="text-xs text-neutral-400 font-sans">#NEW</span>
+            </div>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed line-clamp-2">
+              "${tipText}"
+            </p>
+            <div class="flex items-center justify-between text-[9px] text-neutral-400 dark:text-neutral-500 pt-1">
+              <span>트레이너: 나(자랑하기)</span>
+              <span>방금 전</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Insert new card to the top
+      sharedCardsGrid.insertAdjacentHTML('afterbegin', newCardHtml);
+
+      // Trigger fade-in animations
+      setTimeout(() => {
+        const firstCard = sharedCardsGrid.firstElementChild;
+        firstCard.classList.remove('opacity-0', 'translate-y-4');
+        firstCard.classList.add('opacity-100', 'translate-y-0');
+      }, 50);
+
+      // Reset Form fields
+      cardShareForm.reset();
+      removePreviewBtn.click(); // Reset dropzone
+
+      // Trigger custom premium success toast (No-Alert Constraint)
+      customToast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+      customToast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        customToast.classList.remove('translate-y-0', 'opacity-100');
+        customToast.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+      }, 4000);
+    });
+
+    // Mobile Bottom Tab active status highlights
+    function updateActiveTab(element) {
+      document.querySelectorAll('.md\\:hidden.fixed.bottom-0 a').forEach(a => {
+        a.classList.remove('text-poke-red', 'dark:text-poke-red');
+        a.classList.add('text-neutral-400', 'dark:text-neutral-500');
+      });
+      if(element) {
+        element.classList.remove('text-neutral-400', 'dark:text-neutral-500');
+        element.classList.add('text-poke-red', 'dark:text-poke-red');
+      }
+    }
+
+    // Dark & Light Mode Theme Toggle Logic
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+
+    // Sync button icon state with current active theme
+    function updateThemeIcon() {
+      if (document.documentElement.classList.contains('dark')) {
+        themeIcon.className = "fa-solid fa-sun text-lg text-yellow-400";
+      } else {
+        themeIcon.className = "fa-solid fa-moon text-lg";
+      }
+    }
+
+    // Initial run to make sure correct icon is rendered on startup
+    updateThemeIcon();
+
+    themeToggleBtn.addEventListener('click', function() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('color-theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('color-theme', 'dark');
+      }
+      updateThemeIcon();
+    });
+
+    // BACKGROUND PARTICLES CANVAS ENGINE
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    // Resize canvas keeping standard viewport aspect
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initParticles();
+    }
+
+    // Individual Particle Entity
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.8; // Subtle tiny dots
+        this.speedX = (Math.random() - 0.5) * 0.15; // Extremely slow drifting
+        this.speedY = -Math.random() * 0.25 - 0.08; // Upward float
+        this.opacity = Math.random() * 0.5 + 0.2;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        // Loop screen coordinates naturally
+        if (this.y < 0) {
+          this.y = canvas.height;
+          this.x = Math.random() * canvas.width;
+        }
+        if (this.x < 0 || this.x > canvas.width) {
+          this.speedX *= -1;
+        }
+      }
+
+      draw() {
+        const isDark = document.documentElement.classList.contains('dark');
+        // Neutral warm glow adapting to dark and brand red in light theme
+        ctx.fillStyle = isDark 
+          ? `rgba(254, 240, 138, ${this.opacity * 0.12})` // Glow yellow in dark mode
+          : `rgba(238, 21, 21, ${this.opacity * 0.08})`;   // Poke red in light mode
+        
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Populate particle list adaptively based on screensize
+    function initParticles() {
+      particles = [];
+      const density = Math.min(Math.floor(window.innerWidth / 20), 55); // Keep count optimal and subtle
+      for (let i = 0; i < density; i++) {
+        particles.push(new Particle());
+      }
+    }
+
+    // Animation Loop
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('DOMContentLoaded', () => {
+      resizeCanvas();
+      animateParticles();
+    });
+  </script>
+
+</body>
+</html>
